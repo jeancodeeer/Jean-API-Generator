@@ -1,0 +1,1 @@
+{"name": "jean-api", "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04", "forwardPorts": [8888], "portsAttributes": {"8888": {"label": "jean-api", "onAutoForward": "silent"}}, "postCreateCommand": "bash .devcontainer/prep.sh", "remoteUser": "vscode"}
