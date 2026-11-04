@@ -110,6 +110,14 @@ publish_status() {
     echo "## procesos"; pgrep -af llama-server || echo "(ninguno)"
     pgrep -af cloudflared || true
     echo
+    # URLs estables de GitHub (una vez el agente registra los puertos)
+    if [ -n "${CODESPACE_NAME:-}" ]; then
+      echo "## URLs estables (GitHub)"
+      echo "- **grey**: https://${CODESPACE_NAME}-8888.app.github.dev/v1"
+      [ "$MEM_MB" -ge 14000 ] && echo "- **marvel**: https://${CODESPACE_NAME}-8889.app.github.dev/v1"
+      echo
+    fi
+    echo "## URLs de respaldo (Cloudflare)"
     for name in grey marvel; do
       local url
       url=$(tunnel_url "$name")
@@ -152,8 +160,15 @@ publish_status() {
   local urls; urls=$(mktemp)
   {
     local g m
-    g=$(tunnel_url grey);   [ -n "$g" ] && echo "grey=${g}/v1"
-    m=$(tunnel_url marvel); [ -n "$m" ] && echo "marvel=${m}/v1"
+    # estables (GitHub) primero; Cloudflare como respaldo
+    if [ -n "${CODESPACE_NAME:-}" ]; then
+      echo "grey=https://${CODESPACE_NAME}-8888.app.github.dev/v1"
+      if [ "$MEM_MB" -ge 14000 ]; then
+        echo "marvel=https://${CODESPACE_NAME}-8889.app.github.dev/v1"
+      fi
+    fi
+    g=$(tunnel_url grey);   [ -n "$g" ] && echo "grey_cloudflare=${g}/v1"
+    m=$(tunnel_url marvel); [ -n "$m" ] && echo "marvel_cloudflare=${m}/v1"
   } > "$urls"
   local ub64 usha ubody
   ub64=$(base64 -w0 "$urls")
