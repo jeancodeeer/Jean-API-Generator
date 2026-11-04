@@ -24,7 +24,13 @@ start_model() {
 }
 
 start_model grey 8888
-start_model marvel 8889
+# Marvel solo si hay RAM de sobra (16 GB); en 8 GB no caben los dos.
+MEM_MB=$(awk '/MemTotal/{print int($2/1024)}' /proc/meminfo 2>/dev/null || echo 0)
+if [ "$MEM_MB" -ge 14000 ]; then
+  start_model marvel 8889
+else
+  echo "[autostart] RAM ${MEM_MB}MB: solo grey (marvel necesita 16GB)"
+fi
 
 # --- status para depurar sin SSH -------------------------------------------
 publish_status() {
