@@ -102,10 +102,12 @@ PY
 
 download_hf() {
   [ -s "$GGDIR/$FILE" ] && return 0
+  local url="https://huggingface.co/$HF_REPO/resolve/main/$FILE"
   echo "[serve] descargando $FILE desde HF $HF_REPO ..."
-  python3 -m pip install -q -U "huggingface_hub[cli]" 2>/dev/null || true
-  huggingface-cli download "$HF_REPO" "$FILE" --token "${HF_TOKEN:?falta HF_TOKEN}" \
-    --local-dir "$GGDIR" --no-progress-bar
+  curl -fL --retry 3 --retry-delay 2 -C - \
+    -H "Authorization: Bearer ${HF_TOKEN:?falta HF_TOKEN}" \
+    "$url" -o "$GGDIR/$FILE.part" \
+    && mv "$GGDIR/$FILE.part" "$GGDIR/$FILE"
 }
 
 # ---------------------------------------------------------------- main
