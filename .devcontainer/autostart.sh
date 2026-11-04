@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # postStartCommand: arranca la API sola en cada inicio del Codespace.
-# Requiere JEAN_API_KEY. Fuente de modelos: HF (JEAN_SOURCE=hf, default).
-# Si existe GH_PAT, publica un status en el repo para depurar sin SSH.
+# Requiere JEAN_API_KEY. Modelos desde HF (JEAN_SOURCE=hf).
+# Publica logs + URLs de tunnel + self-test en logs/status.md (si hay GH_PAT).
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -23,14 +23,34 @@ start_model() {
     nohup bash "$ROOT/serve.sh" "$model" > "/tmp/serve-$model.log" 2>&1 &
 }
 
+# --- cloudflared: expone el puerto sin depender del reenvio de GitHub --------
+CF="$HOME/bin/cloudflared"
+install_cf() {
+  [ -x "$CF" ] && return 0
+  mkdir -p "$HOME/bin"
+  curl -fsSL -o "$CF" \
+    https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
+    && chmod +x "$CF"
+}
+
+start_tunnel() {
+  local port="$1" name="$2"
+  install_cf || { echo "[autostart] sin cloudflared"; return 0; }
+  pkill -f "cloudflared.*localhost:${port}" 2>/dev/null || true
+  nohup "$CF" tunnel --url "http://localhost:${port}" --no-autoupdate \
+    > "/tmp/cf-$name.log" 2>&1 &
+}
+
 start_model grey 8888
-# Marvel solo si hay RAM de sobra (16 GB); en 8 GB no caben los dos.
 MEM_MB=$(awk '/MemTotal/{print int($2/1024)}' /proc/meminfo 2>/dev/null || echo 0)
 if [ "$MEM_MB" -ge 14000 ]; then
   start_model marvel 8889
 else
   echo "[autostart] RAM ${MEM_MB}MB: solo grey (marvel necesita 16GB)"
 fi
+
+start_tunnel 8888 grey
+[ "$MEM_MB" -ge 14000 ] && start_tunnel 8889 marvel
 
 # --- status para depurar sin SSH -------------------------------------------
 publish_status() {
@@ -39,17 +59,28 @@ publish_status() {
   {
     echo "# status $(date -u +%FT%TZ)"
     echo
-    echo '## memoria'
-    free -m || true
+    echo "## RAM"; free -m || true
     echo
-    echo '## procesos'
-    pgrep -af llama-server || echo "(ninguno)"
+    echo "## procesos"; pgrep -af llama-server || echo "(ninguno)"
+    pgrep -af cloudflared || true
+    echo
+    for name in grey marvel; do
+      local url
+      url=$(grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' "/tmp/cf-$name.log" 2>/dev/null | head -1)
+      [ -n "$url" ] && echo "- **$name**: $url"
+    done
+    echo
+    echo "## self-test"
+    for port in 8888 8889; do
+      local out
+      out=$(curl -s -m 8 -H "Authorization: Bearer $JEAN_API_KEY" \
+            "http://localhost:$port/v1/models" 2>/dev/null | head -c 200)
+      [ -n "$out" ] && echo "- :$port -> $out"
+    done
     echo
     for f in /tmp/serve-*.log; do
       [ -f "$f" ] || continue
-      echo "## $(basename "$f")"
-      tail -n 40 "$f"
-      echo
+      echo "## $(basename "$f")"; tail -n 15 "$f"; echo
     done
   } > "$tmp"
 
@@ -69,6 +100,6 @@ publish_status() {
   rm -f "$tmp"
 }
 
-sleep 25
+sleep 30
 publish_status
 echo "[autostart] listo"
