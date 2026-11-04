@@ -69,6 +69,12 @@ fi
 start_tunnel 8888 grey
 [ "$MEM_MB" -ge 14000 ] && start_tunnel 8889 marvel
 
+# watchdog: relanza un modelo si deja de responder
+if ! pgrep -f "watchdog.sh" >/dev/null 2>&1; then
+  setsid nohup bash "$HERE/watchdog.sh" > /tmp/watchdog.log 2>&1 &
+  echo "[autostart] watchdog lanzado"
+fi
+
 # --- status para depurar sin SSH -------------------------------------------
 publish_status() {
   [ -z "${GH_PAT:-}" ] && return 0
@@ -120,7 +126,27 @@ publish_status() {
   curl -s -X PUT -H "Authorization: Bearer $GH_PAT" -H "Accept: application/vnd.github+json" \
     "https://api.github.com/repos/$REPO/contents/logs/status.md" -d "$body" >/dev/null \
     && echo "[autostart] status publicado"
-  rm -f "$tmp"
+
+  # urls.txt: solo las URLs publicas, facil de parsear
+  local urls; urls=$(mktemp)
+  {
+    grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' /tmp/cf-grey.log 2>/dev/null | head -1 | sed 's|$|/v1|; s|^|grey=|'
+    grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' /tmp/cf-marvel.log 2>/dev/null | head -1 | sed 's|$|/v1|; s|^|marvel=|'
+  } > "$urls"
+  local ub64 usha ubody
+  ub64=$(base64 -w0 "$urls")
+  usha=$(curl -s -H "Authorization: Bearer $GH_PAT" \
+        "https://api.github.com/repos/$REPO/contents/logs/urls.txt" \
+        | python3 -c 'import json,sys;print(json.load(sys.stdin).get("sha",""))' 2>/dev/null)
+  if [ -n "$usha" ]; then
+    ubody=$(python3 -c 'import json,sys;print(json.dumps({"message":"urls","content":sys.argv[1],"sha":sys.argv[2],"branch":"main"}))' "$ub64" "$usha")
+  else
+    ubody=$(python3 -c 'import json,sys;print(json.dumps({"message":"urls","content":sys.argv[1],"branch":"main"}))' "$ub64")
+  fi
+  curl -s -X PUT -H "Authorization: Bearer $GH_PAT" -H "Accept: application/vnd.github+json" \
+    "https://api.github.com/repos/$REPO/contents/logs/urls.txt" -d "$ubody" >/dev/null \
+    && echo "[autostart] urls publicado"
+  rm -f "$tmp" "$urls"
 }
 
 # espera activa a que el servidor responda (max 3 min)
