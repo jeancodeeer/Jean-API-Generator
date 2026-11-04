@@ -7,6 +7,16 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
 REPO="${JEAN_GH_REPO:-jeancodeeer/jean-api}"
 
+# Auto-actualizacion: si el repo trae cambios, re-ejecutar la version nueva.
+# (el workspace del Codespace solo se refresca al reconstruir, no al reiniciar)
+if [ "${JEAN_NO_SELFUPDATE:-0}" != "1" ] && [ -d "$ROOT/.git" ]; then
+  if git -C "$ROOT" pull --ff-only --quiet 2>/dev/null; then
+    echo "[autostart] repo actualizado"
+  fi
+  export JEAN_NO_SELFUPDATE=1
+  exec bash "$ROOT/.devcontainer/autostart.sh" "$@"
+fi
+
 if [ -z "${JEAN_API_KEY:-}" ]; then
   echo "[autostart] falta JEAN_API_KEY - no arranco"
   exit 0
