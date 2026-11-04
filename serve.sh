@@ -69,51 +69,53 @@ hf_get() {  # hf_get <repo> <archivo> <destino> [token]
     && mv "$dst.part" "$dst"
 }
 
-download_github() {  # baja partes del release y reconstruye
+download_github() {  # baja partes del release y reconstruye (repo privado)
   [ -s "$GGDIR/$FILE" ] && return 0
-  local api="https://api.github.com/repos/$GH_REPO/releases/tags/$GH_TAG"
-  local auth=()
-  [ -n "${GH_TOKEN:-}" ] && auth=(-H "Authorization: Bearer $GH_TOKEN")
-  echo "[serve] $FILE no esta; bajando partes de $GH_REPO@$GH_TAG ..."
-  local tmp="$GGDIR/.parts-$BASE"
-  rm -rf "$tmp"; mkdir -p "$tmp"
-  local manifest
-  manifest=$(curl -sL "${auth[@]}" "$api" \
-    | grep -o '"browser_download_url": *"[^"]*'"$BASE"'\.manifest\.json"' \
-    | head -1 | cut -d'"' -f4)
-  [ -n "${manifest:-}" ] || { echo "no encontre $BASE.manifest.json en el release" >&2; exit 1; }
-  curl -sL "${auth[@]}" "$manifest" -o "$tmp/manifest.json"
+  echo "[serve] $FILE no esta; bajando de $GH_REPO@$GH_TAG ..."
+  python3 - "$GH_REPO" "$GH_TAG" "$BASE" "$GGDIR/$FILE" <<'PY'
+import hashlib, json, os, subprocess, sys
 
-  python3 - "$tmp/manifest.json" "$api" "$GGDIR/$FILE" <<'PY'
-import json, os, sys, urllib.request
-man, api, out = sys.argv[1], sys.argv[2], sys.argv[3]
-m = json.load(open(man))
-req = urllib.request.Request(api, headers={"Accept": "application/vnd.github+json"})
-if os.environ.get("GH_TOKEN"):
-    req.add_header("Authorization", "Bearer " + os.environ["GH_TOKEN"])
-urls = {a["name"]: a["browser_download_url"] for a in json.load(urllib.request.urlopen(req))["assets"]}
-tmpdir = os.path.dirname(man)
+repo, tag, base, out = sys.argv[1:5]
+token = os.environ.get("GH_TOKEN", "")
+hdr_json = ["-H", "Accept: application/vnd.github+json"]
+hdr_bin = ["-H", "Accept: application/octet-stream"]
+if token:
+    auth = ["-H", f"Authorization: Bearer {token}"]
+    hdr_json += auth
+    hdr_bin += auth
+
+# En repos privados browser_download_url da 404: hay que usar la API de assets
+# (Accept: octet-stream) y dejar que curl siga el redirect firmado.
+def api_json(url):
+    return json.loads(subprocess.check_output(["curl", "-fsSL", *hdr_json, url]))
+
+rel = api_json(f"https://api.github.com/repos/{repo}/releases/tags/{tag}")
+assets = {a["name"]: a for a in rel["assets"]}
+man = assets.get(base + ".manifest.json")
+if not man:
+    sys.exit(f"no encontre {base}.manifest.json en el release")
+m = json.loads(subprocess.check_output(["curl", "-fsSL", *hdr_bin, man["url"]]))
+
+h = hashlib.sha256()
 with open(out, "wb") as g:
     for p in m["parts"]:
-        dst = os.path.join(tmpdir, p["name"])
-        if not os.path.exists(dst) or os.path.getsize(dst) != p["bytes"]:
-            print(f"[serve]   bajando {p['name']} ({p['bytes']/2**30:.2f} GiB)")
-            urllib.request.urlretrieve(urls[p["name"]], dst)
-        with open(dst, "rb") as f:
-            while True:
-                b = f.read(8 << 20)
-                if not b: break
-                g.write(b)
-        os.remove(dst)
-print("[serve] reconstruido", out)
+        a = assets.get(p["name"])
+        if not a:
+            sys.exit(f"falta el asset {p['name']}")
+        print(f"[serve]   bajando {p['name']} ({p['bytes']/2**30:.2f} GiB)", flush=True)
+        subprocess.run(["curl", "-fsSL", "--retry", "3", *hdr_bin, a["url"]],
+                       stdout=g, check=True)
+with open(out, "rb") as f:
+    for chunk in iter(lambda: f.read(8 << 20), b""):
+        h.update(chunk)
+
+got = h.hexdigest()
+print(f"[serve] sha256 {got}")
+if got != m["sha256"]:
+    os.remove(out)
+    sys.exit(f"[serve] sha256 NO coincide (esperado {m['sha256']})")
+print("[serve] sha256 OK")
 PY
-  echo "[serve] verificando sha256 ..."
-  local want got
-  want=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['sha256'])" "$tmp/manifest.json")
-  got=$(sha256sum "$GGDIR/$FILE" | cut -d' ' -f1)
-  [ "$want" = "$got" ] || { echo "sha256 NO coincide" >&2; rm -f "$GGDIR/$FILE"; exit 1; }
-  echo "[serve] sha256 OK"
-  rm -rf "$tmp"
 }
 
 # ---------------------------------------------------------------- main
