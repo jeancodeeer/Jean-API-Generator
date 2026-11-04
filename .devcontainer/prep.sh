@@ -3,15 +3,15 @@
 # arranque de la API tarde segundos, no minutos. Idempotente.
 set -uo pipefail
 
-python3 -m pip install -q -U "huggingface_hub[cli]" 2>/dev/null || true
-
 mkdir -p "$HOME/gguf"
+
 if [ -n "${HF_TOKEN:-}" ]; then
   for f in jean-grey-v0.7.Q4_K_M.gguf jean-marvel-v0.7.Q4_K_M.gguf; do
     [ -s "$HOME/gguf/$f" ] && continue
     echo "[prep] bajando $f desde HF ..."
-    huggingface-cli download "${JEAN_MODEL_REPO:-JeanCoder/jean-models}" "$f" \
-      --token "$HF_TOKEN" --local-dir "$HOME/gguf" --no-progress-bar \
+    curl -fL --retry 3 -C - -H "Authorization: Bearer $HF_TOKEN" \
+      "https://huggingface.co/${JEAN_MODEL_REPO:-JeanCoder/jean-models}/resolve/main/$f" \
+      -o "$HOME/gguf/$f.part" && mv "$HOME/gguf/$f.part" "$HOME/gguf/$f" \
       || echo "[prep] $f fallo (se baja on-demand)"
   done
 else
@@ -29,5 +29,5 @@ if [ -z "$(find "$HOME/llama" -name llama-server -type f 2>/dev/null | head -1)"
   fi
 fi
 
-echo "[prep] listo: $(find "$HOME/llama" -name llama-server -type f 2>/dev/null | head -1)"
+echo "[prep] llama-server: $(find "$HOME/llama" -name llama-server -type f 2>/dev/null | head -1)"
 ls -la "$HOME/gguf" 2>/dev/null | head -5
