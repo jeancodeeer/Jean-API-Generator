@@ -76,6 +76,8 @@ publish_status() {
   {
     echo "# status $(date -u +%FT%TZ)"
     echo
+    echo "version: $(git -C "$ROOT" log -1 --oneline 2>/dev/null || echo '?')"
+    echo
     echo "## RAM"; free -m || true
     echo
     echo "## procesos"; pgrep -af llama-server || echo "(ninguno)"
