@@ -1,2 +1,2 @@
-grey=https://anaheim-weather-spreading-shadows.trycloudflare.com/v1
-marvel=https://restructuring-encourages-zope-rob.trycloudflare.com/v1
+grey=https://habits-justice-europe-nice.trycloudflare.com/v1
+marvel=https://reduces-shanghai-covers-advanced.trycloudflare.com/v1
