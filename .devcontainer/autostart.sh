@@ -49,13 +49,34 @@ install_cf() {
   [ -x "$CF" ]
 }
 
+tunnel_url() {  # URL publica de un tunel (excluye el endpoint api. de Cloudflare)
+  grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "/tmp/cf-$1.log" 2>/dev/null \
+    | grep -v '//api\.' | head -1
+}
+
 start_tunnel() {
   local port="$1" name="$2"
   install_cf || { echo "[autostart] sin cloudflared (ver /tmp/cf-install.log)"; return 0; }
-  pkill -f "cloudflared.*localhost:${port}" 2>/dev/null || true
-  nohup "$CF" tunnel --url "http://localhost:${port}" --no-autoupdate \
-    > "/tmp/cf-$name.log" 2>&1 &
-  echo "[autostart] tunnel $name -> :$port (pid $!)"
+  local attempt
+  for attempt in 1 2 3 4 5; do
+    pkill -f "cloudflared.*localhost:${port}" 2>/dev/null || true
+    sleep 1
+    : > "/tmp/cf-$name.log"
+    setsid nohup "$CF" tunnel --url "http://localhost:${port}" --no-autoupdate \
+      > "/tmp/cf-$name.log" 2>&1 &
+    local i
+    for i in $(seq 1 15); do
+      sleep 2
+      if [ -n "$(tunnel_url "$name")" ]; then
+        echo "[autostart] tunnel $name listo (intento $attempt)"
+        return 0
+      fi
+    done
+    echo "[autostart] tunnel $name fallo intento $attempt"
+    pkill -f "cloudflared.*localhost:${port}" 2>/dev/null || true
+    sleep 8
+  done
+  echo "[autostart] tunnel $name FALLO tras 5 intentos"
 }
 
 start_model grey 8888
@@ -91,7 +112,7 @@ publish_status() {
     echo
     for name in grey marvel; do
       local url
-      url=$(grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' "/tmp/cf-$name.log" 2>/dev/null | head -1)
+      url=$(tunnel_url "$name")
       [ -n "$url" ] && echo "- **$name**: $url"
     done
     echo
@@ -130,8 +151,9 @@ publish_status() {
   # urls.txt: solo las URLs publicas, facil de parsear
   local urls; urls=$(mktemp)
   {
-    grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' /tmp/cf-grey.log 2>/dev/null | head -1 | sed 's|$|/v1|; s|^|grey=|'
-    grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' /tmp/cf-marvel.log 2>/dev/null | head -1 | sed 's|$|/v1|; s|^|marvel=|'
+    local g m
+    g=$(tunnel_url grey);   [ -n "$g" ] && echo "grey=${g}/v1"
+    m=$(tunnel_url marvel); [ -n "$m" ] && echo "marvel=${m}/v1"
   } > "$urls"
   local ub64 usha ubody
   ub64=$(base64 -w0 "$urls")
