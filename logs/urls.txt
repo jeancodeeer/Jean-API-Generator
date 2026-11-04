@@ -1,2 +1,2 @@
-grey=https://api.trycloudflare.com/v1
-marvel=https://api.trycloudflare.com/v1
+grey=https://anaheim-weather-spreading-shadows.trycloudflare.com/v1
+marvel=https://restructuring-encourages-zope-rob.trycloudflare.com/v1
