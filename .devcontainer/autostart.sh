@@ -28,17 +28,24 @@ CF="$HOME/bin/cloudflared"
 install_cf() {
   [ -x "$CF" ] && return 0
   mkdir -p "$HOME/bin"
-  curl -fsSL -o "$CF" \
-    https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
-    && chmod +x "$CF"
+  {
+    echo "[cf] descargando cloudflared $(date -u +%FT%TZ)"
+    curl -fL --retry 3 -o "$CF" \
+      https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+    chmod +x "$CF"
+    echo "[cf] descarga rc=$?"
+    "$CF" --version || echo "[cf] no ejecuta"
+  } >> /tmp/cf-install.log 2>&1
+  [ -x "$CF" ]
 }
 
 start_tunnel() {
   local port="$1" name="$2"
-  install_cf || { echo "[autostart] sin cloudflared"; return 0; }
+  install_cf || { echo "[autostart] sin cloudflared (ver /tmp/cf-install.log)"; return 0; }
   pkill -f "cloudflared.*localhost:${port}" 2>/dev/null || true
   nohup "$CF" tunnel --url "http://localhost:${port}" --no-autoupdate \
     > "/tmp/cf-$name.log" 2>&1 &
+  echo "[autostart] tunnel $name -> :$port (pid $!)"
 }
 
 start_model grey 8888
@@ -78,6 +85,10 @@ publish_status() {
       [ -n "$out" ] && echo "- :$port -> $out"
     done
     echo
+    for f in /tmp/cf-install.log /tmp/cf-grey.log /tmp/cf-marvel.log; do
+      [ -f "$f" ] || continue
+      echo "## $(basename "$f")"; tail -n 12 "$f"; echo
+    done
     for f in /tmp/serve-*.log; do
       [ -f "$f" ] || continue
       echo "## $(basename "$f")"; tail -n 15 "$f"; echo
@@ -100,6 +111,12 @@ publish_status() {
   rm -f "$tmp"
 }
 
-sleep 30
+# espera activa a que el servidor responda (max 3 min)
+for i in $(seq 1 36); do
+  code=$(curl -s -o /dev/null -w '%{http_code}' -m 5 \
+    -H "Authorization: Bearer $JEAN_API_KEY" http://localhost:8888/v1/models 2>/dev/null || true)
+  [ "$code" = "200" ] && break
+  sleep 5
+done
 publish_status
 echo "[autostart] listo"
