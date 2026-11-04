@@ -1,0 +1,2 @@
+grey=https://api.trycloudflare.com/v1
+marvel=https://api.trycloudflare.com/v1
