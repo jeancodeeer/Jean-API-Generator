@@ -22,8 +22,14 @@ GET  https://<url-publica>/v1/models
 Authorization: Bearer $JEAN_API_KEY
 ```
 
-La URL pública la publica el propio Codespace en [`logs/status.md`](logs/status.md)
-(túnel de Cloudflare) junto con un self-test de cada puerto.
+La URL pública la publica el propio Codespace en [`logs/urls.txt`](logs/urls.txt)
+(solo las URLs, fácil de parsear) y el detalle completo —memoria, procesos,
+self-test, logs— en [`logs/status.md`](logs/status.md).
+
+```bash
+# el repo es privado: usa gh (o la API con token)
+gh api /repos/jeancodeeer/jean-api/contents/logs/urls.txt --jq .content | base64 -d
+```
 
 ## Dónde viven los pesos
 
