@@ -19,7 +19,7 @@ case "$MODEL" in
 esac
 
 PORT="${PORT:-8888}"
-SRC="${JEAN_SOURCE:-github}"
+SRC="${JEAN_SOURCE:-hf}"
 GH_REPO="${JEAN_GH_REPO:-jeancodeeer/jean-api}"
 GH_TAG="${JEAN_GH_TAG:-v0.7-models}"
 HF_REPO="${JEAN_REPO:-JeanCoder/jean-models}"
