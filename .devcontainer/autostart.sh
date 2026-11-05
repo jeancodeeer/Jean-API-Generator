@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # postStartCommand: arranca la API sola en cada inicio del Codespace.
 # Requiere JEAN_API_KEY. Modelos desde HF (JEAN_SOURCE=hf).
-# Publica logs + URLs de tunnel + self-test en logs/status.md (si hay GH_PAT).
+# Escribe logs + self-test en ~/logs/ (SOLO local: nunca publica URLs al repo).
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -142,48 +142,20 @@ publish_status() {
     done
   } > "$tmp"
 
-  local b64 sha body
-  b64=$(base64 -w0 "$tmp")
-  sha=$(curl -s -H "Authorization: Bearer $GH_PAT" \
-        "https://api.github.com/repos/$REPO/contents/logs/status.md" \
-        | python3 -c 'import json,sys;print(json.load(sys.stdin).get("sha",""))' 2>/dev/null)
-  if [ -n "$sha" ]; then
-    body=$(python3 -c 'import json,sys;print(json.dumps({"message":"codespace status","content":sys.argv[1],"sha":sys.argv[2],"branch":"main"}))' "$b64" "$sha")
-  else
-    body=$(python3 -c 'import json,sys;print(json.dumps({"message":"codespace status","content":sys.argv[1],"branch":"main"}))' "$b64")
-  fi
-  curl -s -X PUT -H "Authorization: Bearer $GH_PAT" -H "Accept: application/vnd.github+json" \
-    "https://api.github.com/repos/$REPO/contents/logs/status.md" -d "$body" >/dev/null \
-    && echo "[autostart] status publicado"
-
-  # urls.txt: solo las URLs publicas, facil de parsear
-  local urls; urls=$(mktemp)
+  # Version LOCAL: los logs y las URLs quedan en el Codespace; nada via a GitHub.
+  mkdir -p "$HOME/logs"
+  cp "$tmp" "$HOME/logs/status.md"
   {
     local g m
-    # estables (GitHub) primero; Cloudflare como respaldo
     if [ -n "${CODESPACE_NAME:-}" ]; then
       echo "grey=https://${CODESPACE_NAME}-8888.app.github.dev/v1"
-      if [ "$MEM_MB" -ge 14000 ]; then
-        echo "marvel=https://${CODESPACE_NAME}-8889.app.github.dev/v1"
-      fi
+      [ "$MEM_MB" -ge 14000 ] && echo "marvel=https://${CODESPACE_NAME}-8889.app.github.dev/v1"
     fi
     g=$(tunnel_url grey);   [ -n "$g" ] && echo "grey_cloudflare=${g}/v1"
     m=$(tunnel_url marvel); [ -n "$m" ] && echo "marvel_cloudflare=${m}/v1"
-  } > "$urls"
-  local ub64 usha ubody
-  ub64=$(base64 -w0 "$urls")
-  usha=$(curl -s -H "Authorization: Bearer $GH_PAT" \
-        "https://api.github.com/repos/$REPO/contents/logs/urls.txt" \
-        | python3 -c 'import json,sys;print(json.load(sys.stdin).get("sha",""))' 2>/dev/null)
-  if [ -n "$usha" ]; then
-    ubody=$(python3 -c 'import json,sys;print(json.dumps({"message":"urls","content":sys.argv[1],"sha":sys.argv[2],"branch":"main"}))' "$ub64" "$usha")
-  else
-    ubody=$(python3 -c 'import json,sys;print(json.dumps({"message":"urls","content":sys.argv[1],"branch":"main"}))' "$ub64")
-  fi
-  curl -s -X PUT -H "Authorization: Bearer $GH_PAT" -H "Accept: application/vnd.github+json" \
-    "https://api.github.com/repos/$REPO/contents/logs/urls.txt" -d "$ubody" >/dev/null \
-    && echo "[autostart] urls publicado"
-  rm -f "$tmp" "$urls"
+  } > "$HOME/logs/urls.txt"
+  echo "[autostart] status/urls escritos en ~/logs (local)"
+  rm -f "$tmp"
 }
 
 # espera activa a que el servidor responda (max 3 min)
