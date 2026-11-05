@@ -41,10 +41,9 @@ else
 fi
 BASE="$(basename "$FILE" .gguf)"
 
-# Contexto: Grey aguanta 16k; 27B en 16 GB no entra.
-CTX=8192
-[ "$MODEL" = "grey" ] && CTX=16384
-[ "$MODEL" = "fenix" ] && CTX=4096
+# Contexto: grey y marvel a 16k (la RAM del codespace da); fenix configurable
+CTX=16384
+[ "$MODEL" = "fenix" ] && CTX="${FENIX_CTX:-16384}"
 
 # ---------------------------------------------------------------- llama.cpp
 find_server() { find "$HOME/llama" -name llama-server -type f 2>/dev/null | head -1 || true; }
