@@ -1,0 +1,14 @@
+# Modelos descargados - NO COMMITTAR
+gguf/
+down/
+logs/jean-api-generador.log
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Tokens sensibles (si los usas como archivo)
+*.key
+*.token
+.env
