@@ -146,11 +146,9 @@ publish_status() {
   mkdir -p "$HOME/logs"
   cp "$tmp" "$HOME/logs/status.md"
   {
+    echo "grey_local=127.0.0.1:8888/v1"
+    [ "$MEM_MB" -ge 14000 ] && echo "marvel_local=127.0.0.1:8889/v1"
     local g m
-    if [ -n "${CODESPACE_NAME:-}" ]; then
-      echo "grey=https://${CODESPACE_NAME}-8888.app.github.dev/v1"
-      [ "$MEM_MB" -ge 14000 ] && echo "marvel=https://${CODESPACE_NAME}-8889.app.github.dev/v1"
-    fi
     g=$(tunnel_url grey);   [ -n "$g" ] && echo "grey_cloudflare=${g}/v1"
     m=$(tunnel_url marvel); [ -n "$m" ] && echo "marvel_cloudflare=${m}/v1"
   } > "$HOME/logs/urls.txt"
