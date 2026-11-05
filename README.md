@@ -1,108 +1,79 @@
-# jean-api
+# jean-api — Jean v0.7
 
-API compatible con OpenAI (llama.cpp) que sirve los modelos **Jean v0.7** desde
-un GitHub Codespace, sin GPU y sin tarjeta.
+Modelos de código **Jean v0.7** (Grey / Marvel / Fenix), derivados de la familia
+Qwen3.5 y publicados en HuggingFace **para todo el mundo**.
 
-## Modelos
+Este repo **no aloja ninguna API ni reparte claves**: es un **generador de APIs
+por terminal**. Cada persona corre el generador en su máquina, descarga los
+modelos del repo público de HF y levanta su propia API OpenAI-compatible en
+`127.0.0.1` con una clave que **se genera en su PC** (nada compartido, nada en
+GitHub).
 
-| alias | composición | tamaño | contexto | notas |
+## Modelos (HuggingFace público — sin token)
+
+| modelo | archivo | tamaño | contexto | base |
 |---|---|---|---|---|
-| `jean-grey` | `jean-grey-v0.7.Q4_K_M.gguf` | 2.52 GiB | 16k | **primario** — eval n=60: 0.4833 |
-| `jean-marvel` | `jean-marvel-v0.7.Q4_K_M.gguf` | 4.06 GiB | 8k | eval n=60: 0.3667 |
-| `jean-fenix` | `Qwen3.5-27B-Q4_K_M` + LoRA Jean | 15.6 GiB + 0.6 GiB | 4k | necesita ≥ 32 GB RAM; no entra en el free tier |
+| `jean-grey` | `jean-grey-v0.7.Q4_K_M.gguf` | 2.52 GiB | 16k | Qwen3.5-4B |
+| `jean-marvel` | `jean-marvel-v0.7.Q4_K_M.gguf` | 4.06 GiB | 8k | Qwen3.5-7B |
+| `jean-fenix` | `jean-fenix-v0.7.Q4_K_M.gguf` | ~17.7 GB | 4k | Qwen3.5-27B (mergeado, archivo único) |
 
-Los dos primeros corren **a la vez** en la máquina `standardLinux32gb`
-(4 cores / 16 GB): Grey en `:8888`, Marvel en `:8889`.
-
-## Endpoints
-
-**URLs estables** (no cambian mientras exista el Codespace):
-
-```
-grey   : https://jean-api-5g4g4qjg5r7p377jv-8888.app.github.dev/v1
-marvel : https://jean-api-5g4g4qjg5r7p377jv-8889.app.github.dev/v1
-```
+Repo: [`JeanCoder/jean-models`](https://huggingface.co/JeanCoder/jean-models)
+(la base de Fenix viene de `unsloth/Qwen3.5-27B-GGUF`; existe además
+`jean-fenix-v0.7.lora.gguf`, 0.59 GiB, para el modo ligero base+LoRA).
 
 ```bash
-curl https://jean-api-5g4g4qjg5r7p377jv-8888.app.github.dev/v1/chat/completions \
-  -H "Authorization: Bearer $JEAN_API_KEY" -H "Content-Type: application/json" \
+# verificación de integridad (todos los GGUF tienen su sha256 en el RUNLOG)
+curl -sL https://huggingface.co/JeanCoder/jean-models/resolve/main/jean-grey-v0.7.Q4_K_M.gguf -o grey.gguf
+```
+
+## Generador de APIs (la vía recomendada)
+
+En Windows (PowerShell 5.1+), con `curl.exe` disponible:
+
+```powershell
+.\generator\jean-api-generator.ps1 -Model grey          # clave auto-generada
+.\generator\jean-api-generator.ps1 -Model marvel -Port 8889 -ApiKey "mi-clave"
+.\generator\jean-api-generator.ps1 -Status              # qué APIs hay corriendo
+.\generator\jean-api-generator.ps1 -Stop -Port 8888     # detener una
+```
+
+El generador:
+- descarga el GGUF desde HF público (con resume), cacheándolo en `generator/gguf/`
+- busca un `llama-server.exe` local; si no hay, baja el release oficial win-cpu
+- lanza el servidor **solo en 127.0.0.1** con prioridad baja (no secuestra el PC)
+- genera una **API key aleatoria propia de esa instancia** y la guarda en `key-<puerto>.txt`
+- no pide ningún token: el repo de modelos es público
+
+Salida típica:
+
+```
+=== API Jean-grey LISTA ===
+  URL     : http://127.0.0.1:8888/v1
+  API key : 8dRw3...xkQ   (guardada en key-8888.txt)
+```
+
+Prueba rápida:
+
+```bash
+curl http://127.0.0.1:8888/v1/chat/completions \
+  -H "Authorization: Bearer <clave>" -H "Content-Type: application/json" \
   -d '{"model":"jean-grey","messages":[{"role":"user","content":"hola"}]}'
 ```
 
-### Importante tras un reinicio
+## Requisitos por modelo
 
-GitHub **resetea la visibilidad de los puertos a `private`** en cada arranque, y
-los puertos solo se registran cuando alguien se conecta por SSH. Ambas cosas las
-resuelve `jean-api.ps1`:
+| modelo | RAM mínima | notas |
+|---|---|---|
+| grey (4B) | ~4 GB | corre cómodo en laptops |
+| marvel (7B) | ~6 GB | |
+| fenix (27B) | **≥ 32 GB** | o el modo `-Lora` (base pública + 0.6 GiB de adapter); aún así 27B |
 
-```powershell
-.\jean-api.ps1 start   # arranca codespace, republica puertos, espera a los modelos
-.\jean-api.ps1 urls    # URLs actuales
-.\jean-api.ps1 test    # prueba modelos + comprueba que sin Bearer da 401
-.\jean-api.ps1 stop    # para el codespace (deja de gastar cuota)
-```
+## Espejo y modo Codespace (opcional)
 
-En [`logs/urls.txt`](logs/urls.txt) (y [`logs/status.md`](logs/status.md), con
-logs y self-test) el propio Codespace publica las URLs que conoce, incluidas las
-de respaldo por Cloudflare.
-
-```bash
-# el repo es privado: usa gh (o la API con token)
-gh api /repos/jeancodeeer/jean-api/contents/logs/urls.txt --jq .content | base64 -d
-```
-
-## Dónde viven los pesos
-
-1. **Hugging Face** (privado): `JeanCoder/jean-models`
-   - `jean-grey-v0.7.Q4_K_M.gguf`
-   - `jean-marvel-v0.7.Q4_K_M.gguf`
-   - `jean-fenix-v0.7.lora.gguf`
-2. **GitHub Release** `v0.7-models` (espejo): cada modelo partido en trozos
-   < 2 GiB + `*.manifest.json` con sha256 por parte y sha256 total.
-
-```bash
-cat jean-grey-v0.7.Q4_K_M.part* > jean-grey-v0.7.Q4_K_M.gguf
-sha256sum jean-grey-v0.7.Q4_K_M.gguf   # comparar con el manifest
-```
-
-### Fenix (nota importante)
-
-Fenix **no se sirve en el free tier de Codespaces**: el modelo base
-`Qwen3.5-27B-Q4_K_M.gguf` pesa 15.6 GiB y necesita ≥ 32 GB RAM
-(`llama-server` se cae con OOM de 16 GB). La alternativa funcional es:
-
-1. **LoRA + base pública**: el códig`serve.sh` descarga la base
-   `unsloth/Qwen3.5-27B-GGUF` + el LoRA `jean-fenix-v0.7.lora.gguf`
-   directamente desde HuggingFace (base pública, sin token).
-2. **Merge local 40 GB**: `D:\jean-work\fenix-gguf\jean-fenix-v0.7.merged.gguf`
-   está disponible en tu PC local. Si un día tienes un Codespace con
-   ≥ 32 GB, copia ese archivo y sírvelo sin LoRA. Para el free tier,
-   el enfoque LoRA es la única opción viable.
-
-> LoRA validado: `check_lora.py` confirma 256 pares a/b compatibles.
-
-## Arranque / parada
-
-El Codespace arranca la API solo (`postStartCommand` → `.devcontainer/autostart.sh`).
-
-```bash
-gh codespace list
-gh codespace stop -c <nombre>
-# arrancar:
-gh api -X POST /user/codespaces/<nombre>/start
-```
-
-Secrets necesarios (Codespaces → Settings → Secrets):
-
-| secret | para qué |
-|---|---|
-| `HF_TOKEN` | bajar los GGUF del repo privado |
-| `JEAN_API_KEY` | clave Bearer que exige la API |
-| `GH_PAT` | publicar `logs/status.md` (depuración sin SSH) |
-
-## Ficheros
-
-- `serve.sh` — descarga el modelo y lanza `llama-server`.
-- `.devcontainer/prep.sh` — postCreate: pre-descarga modelos + binario.
-- `.devcontainer/autostart.sh` — postStart: arranca modelos, túneles y status.
-- `logs/status.md` — estado, URLs públicas y self-test.
+- El release `v0.7-models` de este repo replica los pesos en trozos < 2 GiB con
+  manifest sha256 (reconstruir: `cat *.part* > modelo.gguf`).
+- `serve.sh` + `.devcontainer/` permiten servir los modelos desde un Codespace
+  propio (grey+marvel simultáneos en 4c/16 GB free tier). En ese caso las URLs
+  y la clave **son de quien lo despliegue**: este repo no publica ninguna.
+- `check_lora.py` / `gguf_info.py`: utilidades para validar compatibilidad
+  adapter↔base leyendo solo cabeceras GGUF.
