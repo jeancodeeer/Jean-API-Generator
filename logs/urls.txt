@@ -1,4 +1,1 @@
-grey=https://jean-api-5g4g4qjg5r7p377jv-8888.app.github.dev/v1
-marvel=https://jean-api-5g4g4qjg5r7p377jv-8889.app.github.dev/v1
-grey_cloudflare=https://simplified-intelligence-halo-hope.trycloudflare.com/v1
-marvel_cloudflare=https://advisor-printer-presence-geometry.trycloudflare.com/v1
+URLs retiradas de este repo (peticion del propietario). Cada instancia del generador crea su URL y su clave en local; ver generator/jean-api-generator.ps1.
