@@ -16,15 +16,35 @@ Los dos primeros corren **a la vez** en la máquina `standardLinux32gb`
 
 ## Endpoints
 
+**URLs estables** (no cambian mientras exista el Codespace):
+
 ```
-POST https://<url-publica>/v1/chat/completions
-GET  https://<url-publica>/v1/models
-Authorization: Bearer $JEAN_API_KEY
+grey   : https://jean-api-5g4g4qjg5r7p377jv-8888.app.github.dev/v1
+marvel : https://jean-api-5g4g4qjg5r7p377jv-8889.app.github.dev/v1
 ```
 
-La URL pública la publica el propio Codespace en [`logs/urls.txt`](logs/urls.txt)
-(solo las URLs, fácil de parsear) y el detalle completo —memoria, procesos,
-self-test, logs— en [`logs/status.md`](logs/status.md).
+```bash
+curl https://jean-api-5g4g4qjg5r7p377jv-8888.app.github.dev/v1/chat/completions \
+  -H "Authorization: Bearer $JEAN_API_KEY" -H "Content-Type: application/json" \
+  -d '{"model":"jean-grey","messages":[{"role":"user","content":"hola"}]}'
+```
+
+### Importante tras un reinicio
+
+GitHub **resetea la visibilidad de los puertos a `private`** en cada arranque, y
+los puertos solo se registran cuando alguien se conecta por SSH. Ambas cosas las
+resuelve `jean-api.ps1`:
+
+```powershell
+.\jean-api.ps1 start   # arranca codespace, republica puertos, espera a los modelos
+.\jean-api.ps1 urls    # URLs actuales
+.\jean-api.ps1 test    # prueba modelos + comprueba que sin Bearer da 401
+.\jean-api.ps1 stop    # para el codespace (deja de gastar cuota)
+```
+
+En [`logs/urls.txt`](logs/urls.txt) (y [`logs/status.md`](logs/status.md), con
+logs y self-test) el propio Codespace publica las URLs que conoce, incluidas las
+de respaldo por Cloudflare.
 
 ```bash
 # el repo es privado: usa gh (o la API con token)
