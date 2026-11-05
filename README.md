@@ -65,9 +65,21 @@ cat jean-grey-v0.7.Q4_K_M.part* > jean-grey-v0.7.Q4_K_M.gguf
 sha256sum jean-grey-v0.7.Q4_K_M.gguf   # comparar con el manifest
 ```
 
-Fenix no se distribuye como GGUF fusionado: se sirve como
-`unsloth/Qwen3.5-27B-GGUF` (base pública) + `jean-fenix-v0.7.lora.gguf`
-(`llama-server -m base.gguf --lora lora.gguf`).
+### Fenix (nota importante)
+
+Fenix **no se sirve en el free tier de Codespaces**: el modelo base
+`Qwen3.5-27B-Q4_K_M.gguf` pesa 15.6 GiB y necesita ≥ 32 GB RAM
+(`llama-server` se cae con OOM de 16 GB). La alternativa funcional es:
+
+1. **LoRA + base pública**: el códig`serve.sh` descarga la base
+   `unsloth/Qwen3.5-27B-GGUF` + el LoRA `jean-fenix-v0.7.lora.gguf`
+   directamente desde HuggingFace (base pública, sin token).
+2. **Merge local 40 GB**: `D:\jean-work\fenix-gguf\jean-fenix-v0.7.merged.gguf`
+   está disponible en tu PC local. Si un día tienes un Codespace con
+   ≥ 32 GB, copia ese archivo y sírvelo sin LoRA. Para el free tier,
+   el enfoque LoRA es la única opción viable.
+
+> LoRA validado: `check_lora.py` confirma 256 pares a/b compatibles.
 
 ## Arranque / parada
 
