@@ -110,13 +110,11 @@ publish_status() {
     echo "## procesos"; pgrep -af llama-server || echo "(ninguno)"
     pgrep -af cloudflared || true
     echo
-    # URLs estables de GitHub (una vez el agente registra los puertos)
-    if [ -n "${CODESPACE_NAME:-}" ]; then
-      echo "## URLs estables (GitHub)"
-      echo "- **grey**: https://${CODESPACE_NAME}-8888.app.github.dev/v1"
-      [ "$MEM_MB" -ge 14000 ] && echo "- **marvel**: https://${CODESPACE_NAME}-8889.app.github.dev/v1"
-      echo
-    fi
+    # URLs: solo local (nada de nombres de codespace en este script)
+    echo "## endpoints locales"
+    echo "- grey: http://127.0.0.1:8888/v1"
+    [ "$MEM_MB" -ge 14000 ] && echo "- marvel: http://127.0.0.1:8889/v1"
+    echo
     echo "## URLs de respaldo (Cloudflare)"
     for name in grey marvel; do
       local url
