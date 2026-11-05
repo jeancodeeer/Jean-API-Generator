@@ -31,7 +31,10 @@ FENIX_BASE_REPO="unsloth/Qwen3.5-27B-GGUF"
 FENIX_BASE_FILE="Qwen3.5-27B-Q4_K_M.gguf"
 FENIX_LORA_FILE="jean-fenix-v0.7.lora.gguf"
 
-if [ "$MODEL" = "fenix" ]; then
+if [ "$MODEL" = "fenix" ] && [ "${FENIX_LORA_MODE:-0}" != "1" ]; then
+  # archivo UNICO publico (mergeado, 15.4 GiB)
+  FILE="jean-fenix-v0.7.Q4_K_M.gguf"
+elif [ "$MODEL" = "fenix" ]; then
   FILE="$FENIX_BASE_FILE"
 else
   FILE="jean-${MODEL}-v0.7.Q4_K_M.gguf"
@@ -127,9 +130,16 @@ THREADS=$(nproc 2>/dev/null || echo 4)
 LORA_ARGS=()
 
 if [ "$MODEL" = "fenix" ]; then
-  hf_get "$FENIX_BASE_REPO" "$FENIX_BASE_FILE" "$GGDIR/$FENIX_BASE_FILE" ""
-  hf_get "$HF_REPO" "$FENIX_LORA_FILE" "$GGDIR/$FENIX_LORA_FILE" "${HF_TOKEN:-}"
-  LORA_ARGS=(--lora "$GGDIR/$FENIX_LORA_FILE")
+  if [ "${FENIX_LORA_MODE:-0}" = "1" ]; then
+    # modo ligero: base publica + LoRA (equivale al unificado)
+    hf_get "$FENIX_BASE_REPO" "$FENIX_BASE_FILE" "$GGDIR/$FENIX_BASE_FILE" ""
+    hf_get "$HF_REPO" "$FENIX_LORA_FILE" "$GGDIR/$FENIX_LORA_FILE" ""
+    LORA_ARGS=(--lora "$GGDIR/$FENIX_LORA_FILE")
+  else
+    FILE="jean-fenix-v0.7.Q4_K_M.gguf"
+    BASE="jean-fenix-v0.7.Q4_K_M"
+    hf_get "$HF_REPO" "$FILE" "$GGDIR/$FILE" ""
+  fi
 else
   case "$SRC" in
     hf)     hf_get "$HF_REPO" "$FILE" "$GGDIR/$FILE" "${HF_TOKEN:?falta HF_TOKEN}" ;;
