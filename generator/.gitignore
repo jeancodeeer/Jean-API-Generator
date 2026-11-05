@@ -1,14 +1,18 @@
 # Modelos descargados - NO COMMITTAR
 gguf/
 down/
-logs/jean-api-generador.log
+logs/
+
+# Claves auto-generadas por instancia - NUNCA committar
+key-*.txt
+*.key
+*.token
+.env
+
+# Restos de descargas
+*.part
 
 # Python cache
 __pycache__/
 *.pyc
 *.pyo
-
-# Tokens sensibles (si los usas como archivo)
-*.key
-*.token
-.env
