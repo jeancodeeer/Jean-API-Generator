@@ -136,8 +136,8 @@ if [ "$MODEL" = "fenix" ]; then
     hf_get "$HF_REPO" "$FENIX_LORA_FILE" "$GGDIR/$FENIX_LORA_FILE" ""
     LORA_ARGS=(--lora "$GGDIR/$FENIX_LORA_FILE")
   else
-    FILE="jean-fenix-v0.7.Q4_K_M.gguf"
-    BASE="jean-fenix-v0.7.Q4_K_M"
+    FILE="${FENIX_FILE:-jean-fenix-v0.7.Q4_K_M.gguf}"
+    BASE="$(basename "$FILE" .gguf)"
     hf_get "$HF_REPO" "$FILE" "$GGDIR/$FILE" ""
   fi
 else
@@ -150,5 +150,5 @@ fi
 
 echo "[serve] jean-$MODEL en :$PORT (ctx $CTX, $THREADS hilos)"
 exec "$BIN" -m "$GGDIR/$FILE" "${LORA_ARGS[@]}" --host 0.0.0.0 --port "$PORT" \
-  --alias "jean-$MODEL" -c "$CTX" --threads "$THREADS" \
+  --alias "${FENIX_ALIAS:-jean-$MODEL}" -c "$CTX" --threads "$THREADS" \
   --temp 0.2 --top-p 0.9 --api-key "${JEAN_API_KEY:-}"
