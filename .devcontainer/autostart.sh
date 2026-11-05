@@ -86,9 +86,15 @@ if [ "$MEM_MB" -ge 14000 ]; then
 else
   echo "[autostart] RAM ${MEM_MB}MB: solo grey (marvel necesita 16GB)"
 fi
+if [ "$MEM_MB" -ge 30000 ]; then
+  start_model fenix 8890
+else
+  echo "[autostart] RAM ${MEM_MB}MB: sin fenix (necesita 32GB)"
+fi
 
 start_tunnel 8888 grey
 [ "$MEM_MB" -ge 14000 ] && start_tunnel 8889 marvel
+[ "$MEM_MB" -ge 30000 ] && start_tunnel 8890 fenix
 
 # watchdog: relanza un modelo si deja de responder
 if ! pgrep -f "watchdog.sh" >/dev/null 2>&1; then
@@ -123,7 +129,7 @@ publish_status() {
     done
     echo
     echo "## self-test"
-    for port in 8888 8889; do
+    for port in 8888 8889 8890; do
       local out
       out=$(curl -s -m 8 -H "Authorization: Bearer $JEAN_API_KEY" \
             "http://localhost:$port/v1/models" 2>/dev/null | head -c 200)
