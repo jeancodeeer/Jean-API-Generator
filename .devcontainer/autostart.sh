@@ -32,7 +32,7 @@ if [ "$MODE" = "fenix" ]; then
   PORT=8890 JEAN_SOURCE=hf JEAN_GGUF_DIR="$ROOT/gguf" \
     FENIX_FILE="${FENIX_FILE:-jean-fenix-v0.7.lite-IQ3_M.gguf}" \
     FENIX_ALIAS=jean-fenix-lite FENIX_CTX="${FENIX_CTX:-8192}" \
-    setsid nohup bash "$ROOT/serve.sh" fenix > /tmp/serve-fenix.log 2>&1 < /dev/null &
+    setsid nohup bash "$ROOT/serve.sh" fenix > "$ROOT/.autostart-fenix.log" 2>&1 < /dev/null &
   [ -x "$HOME/bin/cloudflared" ] && setsid nohup "$HOME/bin/cloudflared" tunnel --url http://localhost:8890 --no-autoupdate > /tmp/cf-fenix.log 2>&1 &
   echo "[autostart] modo FENIX-LITE en :8890 (persistente via $MODE_FILE)"
   exit 0
