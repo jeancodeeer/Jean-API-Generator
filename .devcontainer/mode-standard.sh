@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-# mode-standard.sh — vuelve al modo estandar del codespace (grey + marvel).
+# mode-standard.sh — vuelve al modo estandar (grey + marvel), persistente.
 set -uo pipefail
+ROOT="${JEAN_REPO_DIR:-/workspaces/jean-api}"
+rm -f "$ROOT/.jean-mode"
 pkill -f watchdog.sh 2>/dev/null
 pkill llama-server 2>/dev/null
+pkill curl 2>/dev/null
 sleep 1
-ROOT="${JEAN_REPO_DIR:-/workspaces/jean-api}"
-[ -f "$ROOT/.devcontainer/autostart.sh" ] || ROOT=$(dirname "$(dirname "$(find / -maxdepth 6 -name autostart.sh 2>/dev/null | head -1)")")
-[ -f "$ROOT/.devcontainer/autostart.sh" ] || { echo "[mode-standard] no encontre autostart"; exit 1; }
-
-setsid nohup bash "$ROOT/.devcontainer/autostart.sh" > /tmp/autostart-manual.log 2>&1 < /dev/null &
-echo "[mode-standard] grey + marvel de vuelta (autostart)"
+setsid nohup bash "$ROOT/.devcontainer/autostart.sh" > /tmp/autostart-standard.log 2>&1 < /dev/null &
+echo "[mode-standard] modo grey + marvel activado (:8888 / :8889)"
