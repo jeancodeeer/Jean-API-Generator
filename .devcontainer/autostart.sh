@@ -22,6 +22,22 @@ if [ -z "${JEAN_API_KEY:-}" ]; then
   exit 0
 fi
 
+# Modo guardado en el WORKSPACE (persiste entre rebuilds):
+#   echo fenix > "$ROOT/.jean-mode"  -> solo fenix-lite en :8890
+#   rm "$ROOT/.jean-mode"            -> estandar (grey + marvel)
+MODE_FILE="$ROOT/.jean-mode"
+MODE=$(cat "$MODE_FILE" 2>/dev/null || echo standard)
+if [ "$MODE" = "fenix" ]; then
+  mkdir -p "$ROOT/gguf"
+  PORT=8890 JEAN_SOURCE=hf JEAN_GGUF_DIR="$ROOT/gguf" \
+    FENIX_FILE="${FENIX_FILE:-jean-fenix-v0.7.lite-IQ3_M.gguf}" \
+    FENIX_ALIAS=jean-fenix-lite FENIX_CTX="${FENIX_CTX:-8192}" \
+    setsid nohup bash "$ROOT/serve.sh" fenix > /tmp/serve-fenix.log 2>&1 < /dev/null &
+  [ -x "$HOME/bin/cloudflared" ] && setsid nohup "$HOME/bin/cloudflared" tunnel --url http://localhost:8890 --no-autoupdate > /tmp/cf-fenix.log 2>&1 &
+  echo "[autostart] modo FENIX-LITE en :8890 (persistente via $MODE_FILE)"
+  exit 0
+fi
+
 start_model() {
   local model="$1" port="$2"
   if pgrep -f "llama-server.*--port ${port}" >/dev/null 2>&1; then
@@ -29,7 +45,9 @@ start_model() {
     return 0
   fi
   echo "[autostart] lanzando $model en :$port"
-  PORT="$port" JEAN_SOURCE="${JEAN_SOURCE:-hf}" \
+  # los GGUF van al WORKSPACE (persiste entre rebuilds del codespace)
+  mkdir -p "$ROOT/gguf"
+  PORT="$port" JEAN_SOURCE="${JEAN_SOURCE:-hf}" JEAN_GGUF_DIR="$ROOT/gguf" \
     nohup bash "$ROOT/serve.sh" "$model" > "/tmp/serve-$model.log" 2>&1 &
 }
 
