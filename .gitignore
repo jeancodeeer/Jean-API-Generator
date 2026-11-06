@@ -1,0 +1,3 @@
+# Los modelos descargados y el modo del codespace no se committean
+gguf/
+.jean-mode
