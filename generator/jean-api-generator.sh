@@ -46,10 +46,18 @@ model_file() {
 }
 
 model_ctx() {
+  # RAM-aware: 128k solo en maquinas grandes (KV q8_0 ~2 GB por modelo a 128k)
+  local ram_gb=0
+  if command -v free >/dev/null 2>&1; then
+    ram_gb=$(( $(free -m | awk '/^Mem:/{print $2}') / 1024 ))
+  else
+    ram_gb=$(( $(sysctl -n hw.memsize 2>/dev/null || echo 0) / 1024 / 1024 / 1024 ))
+  fi
   case "$1" in
-    grey)   echo 16384 ;;
-    marvel) echo 8192 ;;
-    fenix)  echo 4096 ;;
+    fenix) echo 131072 ;;
+    *) if [ "$ram_gb" -ge 20 ]; then echo 131072
+       elif [ "$ram_gb" -ge 12 ]; then echo 65536
+       else echo 8192; fi ;;
   esac
 }
 
@@ -215,7 +223,8 @@ OUTLOG="$LOGDIR/jean-$MODEL-$PORT.out.log"
 ERRLOG="$LOGDIR/jean-$MODEL-$PORT.err.log"
 log "lanzando jean-$MODEL en http://127.0.0.1:$PORT (ctx $CTX, $THREADS hilos)"
 nohup "$BIN" -m "$DEST" --host 127.0.0.1 --port "$PORT" --alias "jean-$MODEL" \
-  -c "$CTX" --threads "$THREADS" --temp 0.2 --top-p 0.9 --api-key "$API_KEY" \
+  -c "$CTX" --threads "$THREADS" -ctk q8_0 -ctv q8_0 \
+  --temp 0.2 --top-p 0.9 --api-key "$API_KEY" \
   > "$OUTLOG" 2> "$ERRLOG" &
 SRV_PID=$!
 ( sleep 2; renice -n 10 -p "$SRV_PID" >/dev/null 2>&1 ) || true
