@@ -6,12 +6,13 @@ set -uo pipefail
 pkill -f watchdog.sh 2>/dev/null
 pkill llama-server 2>/dev/null
 sleep 1
-DIR=$(cd "$(dirname "$0")" && pwd)
-ROOT=$(dirname "$DIR")
+ROOT="${JEAN_REPO_DIR:-/workspaces/jean-api}"
+[ -f "$ROOT/serve.sh" ] || ROOT=$(dirname "$(find / -maxdepth 5 -name serve.sh 2>/dev/null | head -1)")
+[ -f "$ROOT/serve.sh" ] || { echo "[mode-fenix] no encontre serve.sh"; exit 1; }
 
 PORT=8890 FENIX_FILE="${FENIX_FILE:-jean-fenix-v0.7.lite-IQ4_XS.gguf}" \
   FENIX_ALIAS="${FENIX_ALIAS:-jean-fenix-lite}" FENIX_CTX="${FENIX_CTX:-4096}" \
-  nohup bash "$ROOT/serve.sh" fenix > /tmp/serve-fenix.log 2>&1 &
+  setsid nohup bash "$ROOT/serve.sh" fenix > /tmp/serve-fenix.log 2>&1 < /dev/null &
 
-echo "[mode-fenix] fenix-lite lanzando en :8890 (la primera vez descarga ~13.6 GiB)"
+echo "[mode-fenix] fenix-lite lanzando en :8890 (la primera vez descarga ~14 GiB)"
 echo "[mode-fenix] progreso: tail -f /tmp/serve-fenix.log"
