@@ -15,7 +15,8 @@ generador + los scripts de despliegue.
 |---|---|---|---|
 | **Jean Grey** | Qwen3.5-4B | 2.52 GiB | el primario de código (eval n=60: 0.4833) |
 | **Jean Marvel** | Qwen3.5-7B | 4.06 GiB | agente secundario |
-| **Jean Fénix** | Qwen3.5-27B | 15.41 GiB (Q4_K_M) o ~18.6 GiB (Q5_K_M, casi sin degradación) | el grande, entrenado con LoRA (rank 64, alpha 128) |
+| **Jean Fénix (full)** | Qwen3.5-27B | 15.41 GiB (Q4_K_M) o 17.91 GiB (Q5_K_M, casi sin degradación) | el grande, entrenado con LoRA (rank 64, alpha 128) |
+| **Jean Fénix (lite)** | Qwen3.5-27B | ~13.6 GiB (IQ4_XS) o ~11.7 GiB (IQ3_M) | versión **reducida** para nubes de 16 GB; para Fénix al **100%** usa el full en local (máquina ≥32 GB) u Oracle |
 
 Todos son ficheros **GGUF** estándar de llama.cpp: un solo archivo cada uno,
 descargables **sin token** de [JeanCoder/jean-models](https://huggingface.co/JeanCoder/jean-models).
@@ -82,21 +83,31 @@ Qué hace el generador (ambos son equivalentes):
 4. genera una **clave aleatoria propia de esa instancia** (`key-<puerto>.txt`)
 5. nada de esto toca ningún repo: modelos, logs y claves van al `.gitignore`
 
-## 5. Forma B — nube gratuita de GitHub (Grey + Marvel)
+## 5. Forma B — nube gratuita de GitHub (Grey + Marvel, y Fénix-lite)
 
-Un Codespace de 4 cores / 16 GB corre **Grey y Marvel a la vez**. Tu PC solo
-habla con la URL estable del Codespace.
+Un Codespace de 4 cores / 16 GB corre **Grey y Marvel a la vez** (contexto
+**128k** cada uno, verificado en vivo). Fénix **lite** también puede correr
+ahí, pero **en modo exclusivo**: o Fénix-lite, o Grey+Marvel (la RAM no da
+para todo).
 
 ```powershell
 # en tu PC (necesita $env:GH_TOKEN = tu PAT):
-.\jean-api.ps1 start    # arranca el codespace, publica puertos, espera modelos
-.\jean-api.ps1 test     # prueba inferencia + comprueba 401 sin clave
-.\jean-api.ps1 stop     # apaga (deja de gastar cuota)
+.\jean-api.ps1 start          # arranca codespace, registra puertos, espera modelos
+.\jean-api.ps1 test           # prueba inferencia + comprueba 401 sin clave
+.\jean-api.ps1 fenix-mode     # CAMBIA a Fénix-lite (:8890) [descarga ~13.6 GiB la 1ª vez]
+.\jean-api.ps1 standard-mode  # vuelve a Grey + Marvel (:8888/:8889)
+.\jean-api.ps1 stop           # apaga (deja de gastar cuota)
 ```
 
+- Contexto: **131072 tokens** por modelo (KV en q8_0; el GGUF soporta 256k
+  nativo, pero ambos a 256k no caben en 16 GB — sería solo un modelo).
+- **Fénix-lite es una versión REDUCIDA** (IQ4_XS): funcional pero por debajo
+  del full. Para Fénix **al 100%**, sirve el full en una máquina ≥32 GB
+  (ver forma C o el generador local en una máquina potente).
 - Cuota free: 120 core-h/mes → ~30 h de uso a 4 cores; idle timeout 60 min.
-- Las URLs son `https://<nombre-codespace>-{8888|8889}.app.github.dev/v1`
-  y la clave vive SOLO en tu PC (variable `JEAN_API_KEY`).
+- **El Codespace se duerme a los 60 min** y mientras duerme su URL responde
+  404: es normal. `.\jean-api.ps1 start` lo despierta (también registra los
+  puertos, que GitHub resetea en cada arranque).
 
 ## 6. Forma C — Oracle Always Free ARM (Fénix permanente) ★
 
