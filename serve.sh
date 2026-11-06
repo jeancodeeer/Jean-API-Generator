@@ -41,9 +41,11 @@ else
 fi
 BASE="$(basename "$FILE" .gguf)"
 
-# Contexto: grey y marvel a 16k (la RAM del codespace da); fenix configurable
-CTX=16384
-[ "$MODEL" = "fenix" ] && CTX="${FENIX_CTX:-16384}"
+# Contexto: 128k con KV q8_0 (verificado en vivo: ambos a la vez, 3.7 GB
+# libres en el codespace de 16 GB). Fenix: FENIX_CTX configurable; el lite
+# en 16 GB debe bajarlo (4096-8192).
+CTX=131072
+[ "$MODEL" = "fenix" ] && CTX="${FENIX_CTX:-131072}"
 
 # ---------------------------------------------------------------- llama.cpp
 find_server() { find "$HOME/llama" -name llama-server -type f 2>/dev/null | head -1 || true; }
@@ -150,4 +152,5 @@ fi
 echo "[serve] jean-$MODEL en :$PORT (ctx $CTX, $THREADS hilos)"
 exec "$BIN" -m "$GGDIR/$FILE" "${LORA_ARGS[@]}" --host 0.0.0.0 --port "$PORT" \
   --alias "${FENIX_ALIAS:-jean-$MODEL}" -c "$CTX" --threads "$THREADS" \
+  -ctk q8_0 -ctv q8_0 \
   --temp 0.2 --top-p 0.9 --api-key "${JEAN_API_KEY:-}"
