@@ -1,10 +1,10 @@
-# Graph Report - codespaces-jean  (2026-11-06)
+# Graph Report - codespaces-jean  (2026-11-07)
 
 ## Corpus Check
 - cluster-only mode — file stats not available
 
 ## Summary
-- 90 nodes · 132 edges · 18 communities (7 shown, 11 thin omitted)
+- 98 nodes · 138 edges · 20 communities (7 shown, 13 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 5 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
@@ -20,7 +20,6 @@
 - read_tensor_table
 - autostart.sh
 - watchdog.sh
-- serve.sh
 - jean-api-generator.ps1
 - setup-vm.sh
 - test_ctx.sh
@@ -32,6 +31,7 @@
 - probe_asset.sh
 - test_fenix_lite.sh
 - test_github_source.sh
+- test_github_source.sh
 
 ## God Nodes (most connected - your core abstractions)
 1. `read_tensor_table()` - 10 edges
@@ -41,9 +41,9 @@
 5. `split()` - 4 edges
 6. `autostart.sh script` - 4 edges
 7. `setup-vm.sh script` - 4 edges
-8. `api()` - 3 edges
-9. `main()` - 3 edges
-10. `sha256_file()` - 3 edges
+8. `sha256_file()` - 3 edges
+9. `api()` - 3 edges
+10. `main()` - 3 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `main()` --calls--> `read_tensor_table()`  [EXTRACTED]
@@ -52,7 +52,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (18 total, 11 thin omitted)
+## Communities (20 total, 13 thin omitted)
 
 ### Community 0 - "set_secrets.py"
 Cohesion: 0.23
@@ -70,27 +70,27 @@ Nodes (6): install_cf(), publish_status(), autostart.sh script, start_model(), s
 Cohesion: 0.60
 Nodes (5): check_model(), check_tunnel(), publish_urls(), watchdog.sh script, tunnel_url()
 
-### Community 6 - "serve.sh"
+### Community 7 - "jean-api-generator.ps1"
 Cohesion: 0.60
 Nodes (5): download_github(), find_server(), hf_get(), install_llama(), serve.sh script
 
-### Community 7 - "jean-api-generator.ps1"
+### Community 8 - "setup-vm.sh"
 Cohesion: 0.60
 Nodes (3): Get-HfFile(), Get-LlamaServer(), Log()
 
-### Community 8 - "setup-vm.sh"
+### Community 9 - "test_ctx.sh"
 Cohesion: 0.70
 Nodes (4): model_ctx(), model_file(), model_port(), setup-vm.sh script
 
 ## Knowledge Gaps
-- **11 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `read_tensor_table()` connect `read_tensor_table` to `check_lora.py`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **Are the 5 inferred relationships involving `read_tensor_table()` (e.g. with `.read()` and `.string()`) actually correct?**
   _`read_tensor_table()` has 5 INFERRED edges - model-reasoned connections that need verification._
 - **Why does `Reader` connect `read_tensor_table` to `check_lora.py`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
