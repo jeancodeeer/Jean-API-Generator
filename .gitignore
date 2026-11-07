@@ -1,3 +1,13 @@
-# Los modelos descargados y el modo del codespace no se committean
+# modelos y estado local (nunca committear)
 gguf/
 .jean-mode
+key-*.txt
+*.part
+logs/
+
+# caches de python
+__pycache__/
+*.pyc
+
+# graphify: el reporte y el grafo SI van en el repo; solo su cache no
+graphify-out/cache/
