@@ -10,7 +10,7 @@
 #>
 param(
   [Parameter(Position = 0)]
-  [ValidateSet("start", "stop", "urls", "test", "status")]
+  [ValidateSet("start", "stop", "urls", "test", "status", "fenix-mode", "standard-mode")]
   [string]$Action = "urls"
 )
 
@@ -19,7 +19,7 @@ if (-not $env:GH_TOKEN) {
   throw "define \$env:GH_TOKEN con tu PAT antes de usar este script (el token no se guarda en repos)"
 }
 $gh = "G:\LIFE IN DANGER\tools\bin\gh.exe"
-$Repo = "jeancodeeer/jean-api"
+$Repo = "jeancodeeeer/jean-api"
 $KeyFile = "D:\jean-work\jean_api_key.txt"
 
 function Get-CodespaceName {
@@ -43,7 +43,9 @@ function Wait-State($name, $want, $maxSec = 300) {
 }
 
 function Set-PortsPublic($name) {
-  # Tras cada reinicio los puertos vuelven a "private": hay que republicarlos.
+  # Tras cada reinicio los puertos vuelven a "private" y SOLO se registran
+  # al conectar por SSH (sin cliente VS Code). El ping SSH los despierta.
+  & $gh codespace ssh -c $name -- "true" 2>&1 | Out-Null
   & $gh codespace ports visibility 8888:public 8889:public -c $name 2>&1 | Out-Null
 }
 
@@ -135,5 +137,18 @@ switch ($Action) {
     } catch {
       Write-Host "seguridad: sin Bearer -> $($_.Exception.Response.StatusCode.value__) (401 esperado)"
     }
+  }
+  "fenix-mode" {
+    $name = Get-CodespaceName
+    Set-PortsPublic $name
+    & $gh codespace ssh -c $name -- "curl -fsSL -H 'Authorization: Bearer `$GH_PAT' https://raw.githubusercontent.com/$Repo/main/.devcontainer/mode-fenix.sh | bash" 2>&1 | Select-Object -Last 2
+    Write-Host "FENIX-LITE lanzando en :8890 (primera vez: descarga ~13.6 GiB)"
+    Write-Host "URL: usa .\jean-api.ps1 urls (puerto 8890) | volver: .\jean-api.ps1 standard-mode"
+  }
+  "standard-mode" {
+    $name = Get-CodespaceName
+    Set-PortsPublic $name
+    & $gh codespace ssh -c $name -- "curl -fsSL -H 'Authorization: Bearer `$GH_PAT' https://raw.githubusercontent.com/$Repo/main/.devcontainer/mode-standard.sh | bash" 2>&1 | Select-Object -Last 2
+    Write-Host "grey + marvel de vuelta (modo estandar)"
   }
 }
