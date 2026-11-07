@@ -179,35 +179,41 @@ mono-servicio Fénix. `oracle/setup-vm.sh` deja todo como servicio systemd en un
 
 ---
 
-## 6. Mapa de tu PC (post-limpieza 2026-11-06)
+## 6. Mapa fisico del proyecto: donde esta TODO (PC + nube)
 
+### Carpetas del PC
 ```
-D:\jean-work\                     ← 11 GiB liberados en la limpieza de hoy
-├── README.md                     ← copia local de este doc
-├── AGENTS.md                     ← copia del mapa para IAs
-├── jean-api.ps1                  ← control diario del Codespace
-├── jean_api_key.txt              ← clave API actual (LOCA L, nunca subir)
-├── codespaces-jean\              ← espejo/git local del repo (árbol canónico)
-├── kaggle\
-│   ├── fenix-hfpub\              ← kernel v9 (merge→Q4_K_M) + logs out4..out9
-│   ├── fenix-q5\                 ← kernel Q5_K_M
-│   └── fenix-lite\               ← kernel IQ4_XS + IQ3_M
-├── archive\                      ← experimentos cerrados (historia, no tocar)
-│   ├── hf-spaces\  lightning-jean\  modal-jean\  eval-out\
-│   └── publish_models.ps1        ← publicación antigua (supersede)
-├── generator\                    ← generador local (.ps1/.sh + key-8888.txt local)
-└── fenix-gguf\                   ← base Qwen3.5-27B-Q4_K_M.gguf (15,6 GB; NO borrar)
-                                    + Modelfile.fenix.local (Ollama local)
-
-G:\LIFE IN DANGER\openjarvis-jean-grey\   ← repo de entrenamiento (✕ no es este repo);
-   scripts/kaggle/RUNLOG.md                evidencia completa del entrenamiento
+D:\jean-work\          <- hub de operacion: README/AGENTS, jean-api.ps1, push_all.ps1,
+   |                        jean_api_key.txt, codespaces-jean\ (espejo del repo),
+   |                        kaggle\ (3 kernels + logs out4..out9), generator\,
+   |                        archive\ (experimentos cerrados)
+D:\jean-work\fenix-gguf\  <- base Qwen3.5-27B-Q4_K_M.gguf (15,65 GB)
+D:\ollama_models\         <- copia local en Ollama de grey+marvel v0.7 (6,9 GB)
+G:\LIFE IN DANGER\openjarvis-jean-grey\   <- REPO DE ENTRENAMIENTO (datasets, LoRA, models/, persona/, RUNLOG)
+G:\LIFE IN DANGER\tools\llama.cpp\      <- fuente de llama.cpp (los builds se regeneran de ahi)
+C:\Users\ferna\.config\opencode\opencode.jsonc  <- providers jean-grey-api / jean-marvel-api
 ```
+Este mapa tambien vive como codigo en `tools/project_map.py` (lo parsea graphify).
 
-**Lo eliminado hoy (11 GiB) y por qué:** `gh-parts\` 8,3 GiB (assets `.part` de la
-distribución antigua — todo está en HF), caché de Grey duplicada en `generator\gguf\`
-2,6 GiB (canónico en HF), y 2 builds de llama.cpp regenerables (276 MiB).
+### Donde viven los pesos (los 8 GGUF)
+- **Fuente canonica: HF publico** `https://huggingface.co/JeanCoder/jean-models` — los 7
+  archivos .gguf de los modelos Jean responden 200 anonimos (verificado 2026-11-07:
+  grey 2.52 · marvel 4.36 · fenix Q4 15.41 · Q5 17.91 · lite IQ3 11.72 · IQ4 14.15 · lora 0.59).
+- **Copias locales**: grey+marvel tambien estan en el store de Ollama
+  (`D:\ollama_models`, 6,9 GB) y en el workspace del Codespace (`/workspaces/jean-api/gguf/`).
+- **Fenix completo/lite**: solo en HF (el PC de 8 GB y el Codespace de 16 GB no lo llevan).
+- **Base** Qwen3.5-27B-Q4_K_M: solo en `D:\jean-work\fenix-gguf\`.
 
----
+### Codespace (el servidor vivo)
+- maquina `jean-api-5g4g4qjg5r7p377jv` (4c/16GB; checkout `/workspaces/jean-api`).
+- llama-server: `/home/vscode/llama/llama-b12110/llama-server`.
+
+### Enlaces web relevantes
+- Perfil GitHub: https://github.com/jeancodeeer
+- Repo del servicio/API: https://github.com/jeancodeeer/jean-api
+- Otros repos: librecodigo · kanye-nest · Batch-IA (privado)
+- Modelos (HF): https://huggingface.co/JeanCoder/jean-models · perfil https://huggingface.co/JeanCoder
+- APIs vivas: grey/marvel (ver §2) · grafo Graphify: https://github.com/Graphify-Labs/graphify
 
 ## 7. Seguridad
 
