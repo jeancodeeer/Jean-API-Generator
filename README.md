@@ -52,28 +52,14 @@ en ninguna máquina gratuita.
   usuario — nunca en archivos ni repos).
 
 ### Bloqueado / pendiente
-- **⚠️ INCIDENTE DEL REPO (situación actual):** GitHub puso el repo original
-  `jeancodeeeer/jean-api` en revisión (oculto para la API/usuarios anónimos pero
-  visible en tu navegador con tu sesión). Causa probable: al verlo público,
-  `set_secrets.py` contenía tokens hardcodeados y el escaneo lo marcó.
-  **Solución aplicada (2026-11-06):** se creó y publicó el repo limpio
-  **`jeancodeeeer/jean-api-mirror`** (privado) con esta reorganización completa,
-  README y grafo Graphify — **es el repo canónico ahora**. El Codespace sigue
-  enlazado al repo original (solo para el servicio API; no depende del git).
-- **Rotación de credenciales pendiente** (PAT de GitHub + token HF) — las
-  credenciales quedaron expuestas a GitHub durante el escaneo. Antes de volver
-  a hacer público CUALQUIER repo histórico, rota primero (§7).
-- **Fénix en la nube:** imposible en el Codespace (16 GB → ~100 s/token). Rutas:
-  máquina de ≥ 32 GB (Oracle pide tarjeta de verificación), o **Kaggle kernel CPU**
-  (30 GB RAM, 12 h/sesión, **sin cuota GPU**, sin tarjeta) como experimento por hacer.
-
-### Límite horario del free tier
-120 core-horas/mes ÷ 4 cores = **~30 h de máquina encendida al mes** (en 2 cores sería
-~60 h). El **tráfico API no cuesta**; gasta el tiempo encendida. `.\jean-api.ps1 stop`
-apaga cuando no se usa; auto-sleep a los 60 min. El códigospace es **una sola máquina
-para todas las APIs** (Grey+Marvel comparten la misma RAM/disco/horas).
-
----
+- **Nada bloqueado.** El falso "incidente" de hoy fue culpa mía: en mis llamadas API
+  escribí el dueño con una `e` de menos (`jeancodeer` en vez de `jeancodeeer`) y todo daba 404 —
+  tu repo nunca dejó de existir. Corregido en 7 archivos con verificación numérica de
+  la `e`, y los scripts ahora **derivan el owner de `GET /user`** (imposible volver a
+  fallar por eso).
+- **Recomendado (tranquilo, no urgente):** rotar el PAT y el token HF — nunca
+  estuvieron en el repo, pero circularon en el chat. Después de rotar:
+  `python tools/set_secrets.py` reinyecta los secrets del Codespace en 1 minuto.
 
 ## 3. Historia completa (cronología)
 
@@ -223,37 +209,22 @@ distribución antigua — todo está en HF), caché de Grey duplicada en `genera
 
 ---
 
-## 7. Seguridad e incidente del repo
+## 7. Seguridad
 
-**Reglas de siempre:** ni URLs ni claves dentro del repo; las claves viven en
-*GitHub Codespace secrets* (set via `tools/set_secrets.py`, **solo variables de
-entorno**) o archivos locales gitignored (`key-*.txt`).
+**Reglas de siempre:** ni URLs ni claves dentro del repo. Las claves viven en
+*GitHub Codespace secrets* (se inyectan via `tools/set_secrets.py`, que lee los
+valores **solo de variables de entorno**) o en archivos locales gitignored
+(`key-*.txt`). El helper con tokens nunca llegó a subirse — el repo está limpio.
 
-**Lo que pasó (2026-11-06):** el repo original `jeancodeeeer/jean-api` pasó a público
-mientras `set_secrets.py` contenía un PAT y el token HF hardcodeados. GitHub lo puso
-en revisión: 404 para API/público (verificado desde 3 redes, incluida la propia
-infraestructura de GitHub vía Codespace), el listado del owner seguía funcionando y
-tu sesión de navegador lo veía — ese cuadro corresponde a un repo *flagged* en
-revisión. Lección aplicada: el helper fue **reescrito 100% basado en env vars** y el
-`.gitignore` reforzado.
+**Lección del día (2026-11-06):** el "repo oculto" nunca existió — mi diagnóstico
+usaba el dueño mal escrito (una `e` de menos: `jeancodeer` en lugar de `jeancodeeer`) y producía
+404 coherentes en todas las redes. Incorporado al repo: el owner se **deriva de la
+API** (`GET /user`) y la ortografía se verifica numéricamente (conteo e-runs).
 
-**Solución aplicada sin soporte:** se creó `jeancodeeeer/jean-api-mirror` (privado,
-limpio, sin historial) y ahí vive ahora TODO: la reorganización, este README, el
-AGENTS y los reportes de Graphify. Cuando el repo original se libere, decide si
-(a) se sincroniza de vuelta y se borra el espejo, o (b) se queda el espejo como
-canónico.
-
-**Te queda pendiente (es de la cuenta, no del repo):**
-1. **Rotar credenciales** desde github.com/settings/tokens y
-   huggingface.co/settings/tokens. Después: `tools/set_secrets.py` reinyecta los
-   secrets del Codespace en 1 minuto y las APIs siguen igual.
-2. (Opcional) abrir ticket en support.github.com para que el repo original se
-   revise/**libere**. Texto sugerido:
-   > "My repository contained my own tokens in a helper script by mistake. I have
-   > removed it (it now reads credentials from environment variables), created a
-   > clean repo, and I am rotating the credentials. Please review/unflag."
-
----
+**Credenciales:** el PAT y el token HF circularon en texto de chat (nunca en repo
+ni logs), así que rotarlos es la práctica recomendada — cuando quieras. Después de
+rotarlos, `tools/set_secrets.py` actualiza los secrets del Codespace y las APIs
+siguen funcionando sin tocar nada más.
 
 ## 8. FAQ operativa
 
@@ -273,10 +244,10 @@ canónico.
 
 ## 9. Roadmap
 
-1. Rotar credenciales (PAT GitHub + token HF) y reinyectar secrets del Codespace
-   con `tools/set_secrets.py`.
-2. (Opcional) ticket en support.github.com para liberar el repo original
-   `jean-api`; mientras tanto `jean-api-mirror` es el canónico.
+1. Rotar credenciales (PAT + token HF) y reinyectar secrets del Codespace con
+   `tools/set_secrets.py`.
+2. (Opcional) borrar el espejo `jean-api-mirror` en GitHub (1 clic; quedó de
+   la falsa alarma y la API me lo deniega por scope).
 3. Experimento Fénix-full en Kaggle CPU con túnel temporal (sin cuota GPU, sin tarjeta).
 4. (Opcional) Oracle A1 ≥32 GB si decides pasar la verificación de identidad.
 5. (Opcional) migrar el Codespace a 2 cores → ~60 h/mes.
