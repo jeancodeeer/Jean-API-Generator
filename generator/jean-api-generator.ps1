@@ -53,11 +53,11 @@ $LogDir    = Join-Path $ScriptDir "logs"
 # ---------------------------------------------------------------------------
 $MODELS = @{
     grey = @{
-        file = "jean-grey-v0.7.Q4_K_M.gguf";   gb = 2.52; ctx = 16384; port = 8888
+        file = "jean-grey-v0.7.Q4_K_M.gguf";   gb = 2.52; ctx = 131072; port = 8888
         repo = "JeanCoder/jean-models"
     }
     marvel = @{
-        file = "jean-marvel-v0.7.Q4_K_M.gguf"; gb = 4.06; ctx = 8192;  port = 8889
+        file = "jean-marvel-v0.7.Q4_K_M.gguf"; gb = 4.06; ctx = 131072;  port = 8889
         repo = "JeanCoder/jean-models"
     }
     fenix = @{
@@ -180,6 +180,13 @@ $m = $MODELS[$Model]
 if ($Port -eq 0) { $Port = $m.port }
 if ($Ctx  -eq 0) { $Ctx  = $m.ctx }
 
+# contexto RAM-aware: 128k solo con RAM de sobra (KV q8_0 ~2 GiB a 128k)
+if ($Model -ne "fenix" -and $Ctx -ge 131072) {
+    $ramGb = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB, 1)
+    if ($ramGb -lt 12) { $Ctx = 8192 }
+    elseif ($ramGb -lt 20) { $Ctx = 65536 }
+}
+
 if ($Model -eq "fenix") {
     $ramGb = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB, 1)
     if ($ramGb -lt 30) {
@@ -230,6 +237,7 @@ $serverArgs = @(
     "--alias", "jean-$Model",
     "-c", "$Ctx",
     "--threads", "$Threads",
+    "-ctk", "q8_0", "-ctv", "q8_0",
     "--temp", "0.2",
     "--top-p", "0.9",
     "--api-key", $ApiKey
