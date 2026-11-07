@@ -5,7 +5,7 @@
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
-REPO="${JEAN_GH_REPO:-jeancodeeer/jean-api}"
+REPO="${JEAN_GH_REPO:-jeancodeeeer/jean-api}"
 
 # Auto-actualizacion: si el repo trae cambios, re-ejecutar la version nueva.
 # (el workspace del Codespace solo se refresca al reconstruir, no al reiniciar)
