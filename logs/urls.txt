@@ -1,1 +1,0 @@
-URLs retiradas de este repo (peticion del propietario). Cada instancia del generador crea su URL y su clave en local; ver generator/jean-api-generator.ps1.
