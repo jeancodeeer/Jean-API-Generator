@@ -11,8 +11,9 @@ q8_0**. Base del pipeline QA: Hugging Face `JeanCoder/jean-models` (público).
 
 ## Reglas duras
 1. **Ninguna clave/URL privada en archivos**: valores solo por env vars/secrets.
-   Para secretos del Codespace usa `tools/set_secrets.py` (toda entrada via entorno).
-   `set_secrets.py` causó un flag de GitHub con tokens hardcodeados — no regresemos.
+   Para secretos del Codespace usa `tools/set_secrets.py` (toda entrada via
+   entorno). Nunca hardcodear el owner de URLs: derivarlo de `GET /user` (una
+   `e` de menos en `jeancodeeer` produjo un falso diagnóstico de "repo oculto").
 2. **No tocar los parámetros de serve.sh** (`-c 131072`, `-ctk/-ctv q8_0`) sin
    re-verificar RAM: en 16 GB solo 2 modelos caben a la vez (verificado en vivo).
 3. `serve.sh` es LA fuente única de parámetros del servidor. `generator/` lo genera
