@@ -1,52 +1,92 @@
 # -*- coding: utf-8 -*-
-"""Mapa fisico del proyecto Jean (leible por graphify: asta parsea este modulo).
-Todo lugar donde vive cualquier parte del proyecto. Si una ruta cambia, CAMBIA AQUI."""
+"""Mapa fisico del proyecto Jean v0.7.
 
-PC = {
-    "hub_operacion": r"D\jean-work",                                # README/AGENTS/control/kernels
-    "control_codespace": r"D\jean-work\jean-api.ps1",
-    "clave_api_local": r"D\jean-work\jean_api_key.txt",
-    "espejo_repo": r"D\jean-work\codespaces-jean",               # = repo byte a byte
-    "kernels_kaggle": r"D\jean-work\kaggle",                     # fenix-hfpub, fenix-lite, fenix-q5
-    "archivo_experimentos": r"D\jean-work\archive",
-    "generador_local": r"D\jean-work\generator",
-    "base_qwen_27b_gguf": r"D\jean-work\fenix-gguf\Qwen3.5-27B-Q4_K_M.gguf",
-    "store_ollama": r"D\ollama_models",                            # copia local de grey+marvel v0.7
-    "repo_entrenamiento": r"G\LIFE IN DANGER\openjarvis-jean-grey",
-    "runlog_evidencia": r"G\LIFE IN DANGER\openjarvis-jean-grey\scripts\kaggle\RUNLOG.md",
-    "fuente_llama_cpp": r"G\LIFE IN DANGER\tools\llama.cpp",
-    "config_opencode": r"C:\Users\ferna\.config\opencode\opencode.jsonc",
-}
+Cada ubicacion es una funcion documentada: graphify las parsea (nodos
+autodescriptivos) y cualquier IA que lea este archivo obtiene TODO el mapa.
+Si una ruta cambia, se edita SOLO aqui (y el README §6).
+"""
+OWNER = "".join(chr(c) for c in (106, 101, 97, 110, 99, 111, 100, 101, 101, 101, 114))  # dueno de github (3 e)
 
-CODESPACE = {
-    "nombre": "jean-api-5g4g4qjg5r7p377jv",
-    "checkout_repo": r"/workspaces/jean-api",
-    "gguf_servidos": r"/workspaces/jean-api/gguf",
-    "llama_server": r"/home/vscode/llama/llama-b12110/llama-server",
-}
+def hub_operacion():
+    """Hub del proyecto en el PC: README.md, AGENTS.md, jean-api.ps1, push_all.ps1, key"""
+    return r"D:\jean-work"
 
-URLS = {
-    "perfil_github": "https://github.com/jeancodeeer",
-    "repo_jean_api": "https://github.com/jeancodeeer/jean-api",
-    "repo_librecodigo": "https://github.com/jeancodeeer/librecodigo",
-    "repo_kanye_nest": "https://github.com/jeancodeeer/kanye-nest",
-    "repo_batch_ia": "https://github.com/jeancodeeer/Batch-IA (privado)",
-    "uo_jean": "https://huggingface.co/JeanCoder",
-    "hf_modelos": "https://huggingface.co/JeanCoder/jean-models",
-    "api_grey": "https://jean-api-5g4g4qjg5r7p377jv-8888.app.github.dev/v1",
-    "api_marvel": "https://jean-api-5g4g4qjg5r7p377jv-8889.app.github.dev/v1",
-    "api_fenix_lite": "https://jean-api-5g4g4qjg5r7p377jv-8890.app.github.dev/v1",
-    "graphify": "https://github.com/Graphify-Labs/graphify"
-}
+def espejo_repo():
+    """Espejo byte-a-byte del repo de github (verificado con blob-sha 28/28)"""
+    return r"D:\jean-work\codespaces-jean"
 
-# pesos de cada modelo y donde viven (canonico = HF publico)
-MODELOS = {
-    "jean-grey Q4_K_M (2.52 GiB)": ["HF jean-models (canonico)", "Ollama store local", "workspace del Codespace"],
-    "jean-marvel Q4_K_M (4.36 GiB)": ["HF jean-models (canonico)", "Ollama store local", "workspace del Codespace"],
+def base_qwen_gguf():
+    """PESO BASE del entrenamiento: Qwen3.5-27B-Q4_K_M.gguf (~15.7 GB), NO borrar sin autorizacion"""
+    return r"D:\jean-work\fenix-gguf\Qwen3.5-27B-Q4_K_M.gguf"
+
+def store_ollama():
+    """Copias LOCALES de los pesos Grey+Marvel v0.7 en Ollama (9 blobs, 6.9 GB)"""
+    return r"D:\ollama_models"
+
+def repo_entrenamiento():
+    """REPO DE ENTRENAMIENTO: datasets, LoRA, codigo de entrenamiento, models/, persona/, data/"""
+    return r"G:\LIFE IN DANGER\openjarvis-jean-grey"
+
+def runlog_evidencia():
+    """RUNLOG: registro cronologico de evidencia del entrenamiento y del pipeline"""
+    return r"G:\LIFE IN DANGER\openjarvis-jean-grey\scripts\kaggle\RUNLOG.md"
+
+def fuente_llama_cpp():
+    """Fuente de llama.cpp (los binarios se compilan de ahi; D:/jean-work/llama-build fue borrado)"""
+    return r"G:\LIFE IN DANGER\tools\llama.cpp"
+
+def kernels_kaggle():
+    """Kernels CPU de Kaggle (fenix-hfpub v9, fenix-q5, fenix-lite) + logs out4..out9"""
+    return r"D:\jean-work\kaggle"
+
+def archivo_experimentos():
+    """Experimentos cerrados: hf-spaces, lightning-jean, modal-jean, eval-out, publish_models"""
+    return r"D:\jean-work\archive"
+
+def config_opencode():
+    """Config de OpenCode en el PC del usuario (providers jean-grey-api y jean-marvel-api)"""
+    return r"C:\Users\ferna\.config\opencode\opencode.jsonc"
+
+def github_repo():
+    """Repositorio principal del servicio/API (Readme completo + grafo graphify-out/)"""
+    return f"https://github.com/{OWNER}/jean-api"
+
+def github_perfil():
+    """Perfil GitHub del dueno (repos: jean-api, librecodigo, kanye-nest, Batch-IA privat)"""
+    return f"https://github.com/{OWNER}"
+
+def hf_modelos():
+    """FUENTE CANONICA de los pesos: repositorio publico con los 7 GGUF (HTTP 200 anonimo)"""
+    return "https://huggingface.co/JeanCoder/jean-models"
+
+def hf_perfil():
+    """Perfil org del dueno en HF"""
+    return "https://huggingface.co/JeanCoder"
+
+def api_grey():
+    """API viva de Jean Grey (OpenAI-compatible, contexto 131072, Bearer JEAN_API_KEY)"""
+    return "https://jean-api-5g4g4qjg5r7p377jv-8888.app.github.dev/v1"
+
+def api_marvel():
+    """API viva de Jean Marvel (OpenAI-compatible, contexto 131072)"""
+    return "https://jean-api-5g4g4qjg5r7p377jv-8889.app.github.dev/v1"
+
+def api_fenix_lite():
+    """Puerto 8890 del Codespace, activo SOLO en modo fenix (FENIX_FILE=$env)"""
+    return "https://jean-api-5g4g4qjg5r7p377jv-8890.app.github.dev/v1"
+
+def graphify_upstream():
+    """Proyecto Graphify (genera graphify-out/: GRAPH_REPORT.md + graph.json + graph.html)"""
+    return "https://github.com/Graphify-Labs/graphify"
+
+# --- tabla rapida: donde vive cada peso (referencia cruzada) ---
+PESOS = {
+    "jean-grey Q4_K_M (2.52 GiB)": ["HF jean-models (canonico)", "Ollama store local", "workspace Codespace"],
+    "jean-marvel Q4_K_M (4.36 GiB)": ["HF jean-models (canonico)", "Ollama store local", "workspace Codespace"],
     "jean-fenix Q4_K_M (15.41 GiB)": ["SOLO HF jean-models (sin copia local)"],
     "jean-fenix Q5_K_M (17.91 GiB)": ["SOLO HF jean-models"],
     "jean-fenix lite-IQ3_M (11.72 GiB)": ["SOLO HF jean-models"],
     "jean-fenix lite-IQ4_XS (14.15 GiB)": ["SOLO HF jean-models"],
     "jean-fenix lora (0.59 GiB)": ["SOLO HF jean-models"],
-    "base Qwen3.5-27B-Q4_K_M (15.65 GiB)": [r"D\jean-work\fenix-gguf"],
+    "base Qwen3.5-27B-Q4_K_M (15.65 GiB)": [r"D:\jean-work\fenix-gguf"],
 }
