@@ -28,6 +28,18 @@ q8_0**. Base del pipeline QA: Hugging Face `JeanCoder/jean-models` (público).
 7. Todo cambio relevante va al `RUNLOG.md` de `openjarvis-jean-grey/scripts/kaggle/`
    (evidencia, no promesas): estado sin tool-output = falso.
 
+## Dónde está TODO (mapa físico + web)
+Fuente completa y actualizada: `tools/project_map.py` (parseable por Graphify) y README §6.
+
+- **Hub en el PC**: `D:\jean-work` — README/AGENTS/`jean-api.ps1`/`push_all.ps1`/`jean_api_key.txt`,
+  espejo del repo en `codespaces-jean\`, kernels Kaggle en `kaggle\`, experimentos en `archive\`.
+- **Pesos de los modelos**: fuente canónica = HF público `https://huggingface.co/JeanCoder/jean-models`
+  (los 7 GGUF de Jean). Copias locales: store de Ollama `D:\ollama_models` (grey+marvel, 6.9 GB) y
+  `gguf/` del workspace del Codespace. Peso base Qwen27B: `D:\jean-work\fenix-gguf\` (NO borrar).
+- **Entrenamiento**: `G:\LIFE IN DANGER\openjarvis-jean-grey` (datasets/LoRA/persona + RUNLOG en `scripts\kaggle\`).
+- **Web**: perfil `https://github.com/jeancodeeer` · repos `jean-api`, `librecodigo`, `kanye-nest` ·
+  HF `https://huggingface.co/JeanCoder` · APIs vivas (Grey :8888, Marvel :8889, Fénix-lite :8890 en modo fenix).
+
 ## Comandos rápidos
 - PC: `D:\jean-work\jean-api.ps1 start|stop|urls|test|status|fenix-mode|standard-mode`
 - dentro del Codespace: `bash tests/test_ctx.sh` (verifica ctx 131072), `bash tests/diag.sh`
