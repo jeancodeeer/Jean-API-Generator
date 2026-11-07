@@ -1,9 +1,9 @@
 {
   ".devcontainer/autostart.sh": {
-    "mtime": 1793968412.9501226,
-    "seen": 1794022168.6865623,
-    "ast_hash": "9bbe64ac4f14e58b309ddf79e27058bf",
-    "semantic_hash": "9bbe64ac4f14e58b309ddf79e27058bf"
+    "mtime": 1794023113.5017297,
+    "seen": 1794028268.549382,
+    "ast_hash": "c79dd7e048e6949c5c1be233ad015654",
+    "semantic_hash": "c79dd7e048e6949c5c1be233ad015654"
   },
   ".devcontainer/devcontainer.json": {
     "mtime": 1793915795.5145078,
@@ -31,10 +31,10 @@
     "semantic_hash": "fe0205ec404c1c5c2144eb8c8962ea5a"
   },
   ".devcontainer/watchdog.sh": {
-    "mtime": 1793799548.0799794,
-    "seen": 1794022168.687843,
-    "ast_hash": "f17bd1692a8ec2076d5e5d6ba1781bb0",
-    "semantic_hash": "f17bd1692a8ec2076d5e5d6ba1781bb0"
+    "mtime": 1794023113.9884088,
+    "seen": 1794028268.5505147,
+    "ast_hash": "c7490cdddca37f02c0c2a1a98a3076c0",
+    "semantic_hash": "c7490cdddca37f02c0c2a1a98a3076c0"
   },
   "generator/jean-api-generator.ps1": {
     "mtime": 1793924441.5257096,
@@ -49,16 +49,16 @@
     "semantic_hash": "25e4b6edb77979a72fc2b760f3d680c6"
   },
   "oracle/setup-vm.sh": {
-    "mtime": 1793919343.7033498,
-    "seen": 1794022168.6886346,
-    "ast_hash": "467d3a86bbd9a790c55addfa559aaba3",
-    "semantic_hash": "467d3a86bbd9a790c55addfa559aaba3"
+    "mtime": 1794023114.2932422,
+    "seen": 1794028268.551047,
+    "ast_hash": "f9f3a3c797b5e4f89c447212c6c6e3fe",
+    "semantic_hash": "f9f3a3c797b5e4f89c447212c6c6e3fe"
   },
   "serve.sh": {
-    "mtime": 1793924280.4882257,
-    "seen": 1794022168.688895,
-    "ast_hash": "1a5aec77a8f6dfc2dbdec177c4dd041a",
-    "semantic_hash": "1a5aec77a8f6dfc2dbdec177c4dd041a"
+    "mtime": 1794023114.7037594,
+    "seen": 1794028268.551049,
+    "ast_hash": "359f17a0e8030b118aed2ec10352b1e8",
+    "semantic_hash": "359f17a0e8030b118aed2ec10352b1e8"
   },
   "tests/diag.sh": {
     "mtime": 1793972276.3485634,
@@ -73,10 +73,10 @@
     "semantic_hash": "86691fe28667673861564c5d762c30ef"
   },
   "tests/probe_asset.sh": {
-    "mtime": 1793832741.8746257,
-    "seen": 1794022168.6896925,
-    "ast_hash": "7df0b05524a4779ddf8aafee4a61f4ba",
-    "semantic_hash": "7df0b05524a4779ddf8aafee4a61f4ba"
+    "mtime": 1794023114.3854332,
+    "seen": 1794028268.551556,
+    "ast_hash": "21bd38e420d893ea52f09c0feddd86ec",
+    "semantic_hash": "21bd38e420d893ea52f09c0feddd86ec"
   },
   "tests/test_ctx.sh": {
     "mtime": 1793923337.889505,
@@ -91,10 +91,10 @@
     "semantic_hash": "33671906bb61a7c6a003396cfb0896a0"
   },
   "tests/test_github_source.sh": {
-    "mtime": 1793833521.8356283,
-    "seen": 1794022168.690506,
-    "ast_hash": "024a9bee9b5fe0fc6a54b5f91a82dfbb",
-    "semantic_hash": "024a9bee9b5fe0fc6a54b5f91a82dfbb"
+    "mtime": 1794023114.5376842,
+    "seen": 1794028268.55206,
+    "ast_hash": "99b65f79416130fb69525bb875bfbae3",
+    "semantic_hash": "99b65f79416130fb69525bb875bfbae3"
   },
   "tools/check_lora.py": {
     "mtime": 1793847802.6958804,
@@ -109,15 +109,27 @@
     "semantic_hash": "5b927d39a5652e7350c7c4af03f61e3d"
   },
   "tools/set_secrets.py": {
-    "mtime": 1794022049.700534,
-    "seen": 1794022168.6913033,
-    "ast_hash": "be93ce4a142759359825b31af3133907",
-    "semantic_hash": "be93ce4a142759359825b31af3133907"
+    "mtime": 1794023197.808309,
+    "seen": 1794028268.55256,
+    "ast_hash": "28c49b44d87653d7c1fa5154f02a82bc",
+    "semantic_hash": "28c49b44d87653d7c1fa5154f02a82bc"
   },
   "tools/split_gguf.py": {
     "mtime": 1793762549.1543086,
     "seen": 1794022168.6915605,
     "ast_hash": "b712ca377f3709fab2f11595a9529836",
     "semantic_hash": "b712ca377f3709fab2f11595a9529836"
+  },
+  "jean-api.ps1": {
+    "mtime": 1794023115.2876873,
+    "seen": 1794028268.5510447,
+    "ast_hash": "91fd0fae00aceb49329aba3ec3cab08f",
+    "semantic_hash": "91fd0fae00aceb49329aba3ec3cab08f"
+  },
+  "tools/project_map.py": {
+    "mtime": 1794028263.5276635,
+    "seen": 1794028268.552557,
+    "ast_hash": "24e3e3a499a72153980e222688d4eeee",
+    "semantic_hash": "24e3e3a499a72153980e222688d4eeee"
   }
 }
