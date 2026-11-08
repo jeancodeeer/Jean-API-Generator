@@ -71,10 +71,6 @@ def api_marvel():
     """API viva de Jean Marvel (OpenAI-compatible, contexto 131072)"""
     return "https://jean-api-5g4g4qjg5r7p377jv-8889.app.github.dev/v1"
 
-def api_fenix_lite():
-    """Puerto 8890 del Codespace, activo SOLO en modo fenix (FENIX_FILE=$env)"""
-    return "https://jean-api-5g4g4qjg5r7p377jv-8890.app.github.dev/v1"
-
 def graphify_upstream():
     """Proyecto Graphify (genera graphify-out/: GRAPH_REPORT.md + graph.json + graph.html)"""
     return "https://github.com/Graphify-Labs/graphify"

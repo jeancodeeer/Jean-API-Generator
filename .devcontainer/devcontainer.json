@@ -4,11 +4,10 @@
   "features": {
     "ghcr.io/devcontainers/features/sshd:1": { "version": "latest" }
   },
-  "forwardPorts": [8888, 8889, 8890],
+  "forwardPorts": [8888, 8889],
   "portsAttributes": {
     "8888": { "label": "jean-grey", "onAutoForward": "silent" },
-    "8889": { "label": "jean-marvel", "onAutoForward": "silent" },
-    "8890": { "label": "jean-fenix", "onAutoForward": "silent" }
+    "8889": { "label": "jean-marvel", "onAutoForward": "silent" }
   },
   "postCreateCommand": "bash .devcontainer/prep.sh",
   "postStartCommand": "bash .devcontainer/autostart.sh",
