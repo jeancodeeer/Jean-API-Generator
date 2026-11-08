@@ -8,7 +8,7 @@ Uso (PowerShell):
   $env:JEAN_GH_PAT       = "ghp_UN_PAT_CON_permisos_repo_y_admin_codespaces"
   $env:SOURCE_HF_TOKEN   = "hf_xxx"
   $env:SOURCE_GH_PAT     = "ghp_xxx"   # el que recibira el secret GH_PAT
-  $env:SOURCE_JEAN_API_KEY = Get-Content D:\\jean-work\\jean_api_key.txt -Raw
+  $env:SOURCE_JEAN_API_KEY = Get-Content <ruta-a-jean_api_key.txt> -Raw
   C:\\Python314\\python.exe tools/set_secrets.py
 """
 

@@ -3,7 +3,7 @@
 # para servir una API Jean v0.7 de forma permanente (systemd).
 #
 # Ejecutar DENTRO de la VM (Ubuntu 22.04/24.04):
-#   curl -fsSL https://raw.githubusercontent.com/jeancodeeeer/jean-api/main/oracle/setup-vm.sh -o setup-vm.sh
+#   curl -fsSL https://raw.githubusercontent.com/jeancodeeer/jean-api/main/oracle/setup-vm.sh -o setup-vm.sh
 #   sudo bash setup-vm.sh --model fenix --api-key "mi-clave"
 #
 # Que hace:

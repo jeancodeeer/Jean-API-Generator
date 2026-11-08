@@ -4,7 +4,7 @@
 # llama-server contra el resultado. Uso: bash test_github_source.sh grey
 set -uo pipefail
 MODEL="${1:-grey}"
-REPO="jeancodeeeer/jean-api"
+REPO="jeancodeeer/jean-api"
 TAG="v0.7-models"
 FILE="jean-${MODEL}-v0.7.Q4_K_M.gguf"
 BASE="$(basename "$FILE" .gguf)"

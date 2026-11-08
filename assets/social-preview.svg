@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="1" stop-color="#1b2433"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <text x="80" y="230" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="110" font-weight="700" fill="#ffffff">jean-api</text>
+  <text x="80" y="305" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="38" fill="#9db3d0">OpenAI-compatible API for GGUF models</text>
+  <text x="80" y="355" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="38" fill="#9db3d0">llama.cpp llama-server on GitHub Codespaces</text>
+  <g font-family="Consolas, Menlo, monospace" font-size="28" fill="#0d1117">
+    <rect x="80" y="430" width="230" height="52" rx="26" fill="#58a6ff"/><text x="106" y="466">128k context</text>
+    <rect x="330" y="430" width="200" height="52" rx="26" fill="#7ee787"/><text x="356" y="466">CPU only</text>
+    <rect x="550" y="430" width="280" height="52" rx="26" fill="#f2cc60"/><text x="576" y="466">Bearer auth</text>
+  </g>
+  <text x="80" y="570" font-family="Consolas, Menlo, monospace" font-size="26" fill="#6e7f99">POST /v1/chat/completions</text>
+</svg>

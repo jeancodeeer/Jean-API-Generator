@@ -4,7 +4,7 @@
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
-REPO="${JEAN_GH_REPO:-jeancodeeeer/jean-api}"
+REPO="${JEAN_GH_REPO:-jeancodeeer/jean-api}"
 CF="$HOME/bin/cloudflared"
 
 tunnel_url() {

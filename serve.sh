@@ -7,7 +7,7 @@
 #   HF_TOKEN       token HF (repo privado de modelos)
 #   JEAN_SOURCE    hf (default) | github   (de dónde bajar los GGUF)
 #   JEAN_REPO      repo HF de modelos       (default JeanCoder/jean-models)
-#   JEAN_GH_REPO   repo GitHub del release  (default jeancodeeeer/jean-api)
+#   JEAN_GH_REPO   repo GitHub del release  (default jeancodeeer/jean-api)
 #   JEAN_GH_TAG    tag del release          (default v0.7-models)
 #   PORT           puerto (default 8888)
 set -euo pipefail
@@ -20,7 +20,7 @@ esac
 
 PORT="${PORT:-8888}"
 SRC="${JEAN_SOURCE:-hf}"
-GH_REPO="${JEAN_GH_REPO:-jeancodeeeer/jean-api}"
+GH_REPO="${JEAN_GH_REPO:-jeancodeeer/jean-api}"
 GH_TAG="${JEAN_GH_TAG:-v0.7-models}"
 HF_REPO="${JEAN_REPO:-JeanCoder/jean-models}"
 GGDIR="${JEAN_GGUF_DIR:-$HOME/gguf}"

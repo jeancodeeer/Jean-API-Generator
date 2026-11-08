@@ -18,9 +18,9 @@ $ErrorActionPreference = "Stop"
 if (-not $env:GH_TOKEN) {
   throw "define \$env:GH_TOKEN con tu PAT antes de usar este script (el token no se guarda en repos)"
 }
-$gh = "G:\LIFE IN DANGER\tools\bin\gh.exe"
-$Repo = "jeancodeeeer/jean-api"
-$KeyFile = "D:\jean-work\jean_api_key.txt"
+$gh = if ($env:GH_CLI) { $env:GH_CLI } else { (Get-Command gh -ErrorAction Stop).Source }
+$Repo = "jeancodeeer/jean-api"
+$KeyFile = if ($env:JEAN_API_KEY_FILE) { $env:JEAN_API_KEY_FILE } else { Join-Path $PSScriptRoot "jean_api_key.txt" }
 
 function Get-CodespaceName {
   $list = & $gh codespace list --repo $Repo --json name,state 2>$null | ConvertFrom-Json
