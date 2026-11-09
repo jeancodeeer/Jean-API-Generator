@@ -143,6 +143,23 @@ sudo bash oracle/setup-vm.sh --model fenix --api-key "…" # systemd service on 
 
 <br>
 
+## 05a — ONE URL FOR EVERY MODEL (ROUTER)
+
+Port **:8899** is also an OpenAI-compatible router: point any client at `https://<codespace>-8899.app.github.dev/v1` and it sees every model the Codespace is serving, including the GGUFs you load from Hugging Face.
+
+| METHOD | PATH | WHAT IT DOES |
+|---|---|---|
+| `GET` | `/v1/models` | models ready on every port, plus `jean.unavailable`: which port is down and why (loading, off, "Fénix does not fit in this RAM") |
+| `POST` | `/v1/chat/completions` · `/v1/completions` · `/v1/embeddings` | sent to the port that serves `model`, streamed through untouched |
+| `GET` | `/health` | public, no data: `{"ok": true, "ready": 2}` |
+
+- `"model": "auto"` picks the first ready model (grey > marvel > fenix > others); a unique partial name also works (`"fenix"`).
+- It never switches models silently: an unavailable model gets a `503` with the list of models that are ready, in OpenAI error format, and the client decides.
+- Same `JEAN_API_KEY` as every port. The response says which model answered (`X-Jean-Model`).
+- Tests: `python tests/test_router.py` (runs in CI with fake llama-servers).
+
+<br>
+
 ## 05b — LOAD ANY HUGGING FACE MODEL (CONTROL SERVER)
 
 `control/control_server.py` listens on **:8899** (started by `autostart.sh`, protected by your `JEAN_API_KEY`). A client such as **[JeanCode](https://github.com/jeancodeeer/JeanCode)** uses it to put any GGUF from Hugging Face on one of the model ports without opening the Codespace:
@@ -154,7 +171,9 @@ sudo bash oracle/setup-vm.sh --model fenix --api-key "…" # systemd service on 
 | `GET` | `/jobs/<id>` | download progress |
 | `POST` | `/restore` `{slot}` | back to the Jean model of that port |
 
-`slot` is `8888`, `8889` or `8890`. An HF token, when sent, is used only for that download and never written to disk. Make port 8899 public together with the model ports (`jean-api.ps1 start` does it). After a Codespace restart the Jean models come back.
+`slot` is `8888`, `8889` or `8890`. An HF token, when sent, is used only for that download and never written to disk. Make port 8899 public together with the model ports (`jean-api.ps1 start` does it). A model loaded this way shows up in the router right away. After a Codespace restart the Jean models come back.
+
+**Fénix mode** (`jean-api.ps1 fenix-mode`) picks, from the models repo on Hugging Face, the largest Fénix GGUF that fits the machine's RAM. When none fits (the 15.4 GB Q4 on a 16 GB Codespace), the router reports the reason instead of failing silently. `serve.sh` refuses to start without `JEAN_API_KEY`, so a public port is never served without a key.
 
 <br>
 

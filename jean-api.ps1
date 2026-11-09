@@ -55,6 +55,9 @@ function Get-Urls($name) {
   foreach ($p in $ports) {
     if ($p.sourcePort -eq 8888) { $out["grey"] = "$($p.browseUrl)/v1" }
     if ($p.sourcePort -eq 8889) { $out["marvel"] = "$($p.browseUrl)/v1" }
+    if ($p.sourcePort -eq 8890) { $out["fenix"] = "$($p.browseUrl)/v1" }
+    # router: una sola URL para todos los modelos (y la que usa JeanCode para Hugging Face)
+    if ($p.sourcePort -eq 8899) { $out["router"] = "$($p.browseUrl)/v1" }
   }
   return $out
 }
@@ -88,6 +91,7 @@ switch ($Action) {
       Start-Sleep 10
     }
     Write-Host ""
+    if ($urls["router"]) { Write-Host "router : $($urls['router'])   <- usa esta en JeanCode (todos los modelos + Hugging Face)" }
     Write-Host "grey   : $($urls['grey'])"
     if ($urls["marvel"]) { Write-Host "marvel : $($urls['marvel'])" }
     Write-Host "clave  : $KeyFile"
@@ -130,6 +134,16 @@ switch ($Action) {
         Write-Host ("{0,-7} ERR {1}" -f $m, $_.Exception.Message)
       }
     }
+    if ($urls["router"]) {
+      try {
+        $r = Invoke-RestMethod -Uri "$($urls['router'])/models" -Headers @{ Authorization = "Bearer $key" } -TimeoutSec 30
+        $ids = ($r.data | ForEach-Object { $_.id }) -join ", "
+        $down = ($r.jean.unavailable | ForEach-Object { "$($_.slot) ($($_.reason))" }) -join "; "
+        Write-Host ("router  OK  modelos={0}{1}" -f $ids, $(if ($down) { "  no disponibles: $down" } else { "" }))
+      } catch {
+        Write-Host ("router  ERR {0} (el Codespace necesita la version con router: reinicialo para que se actualice)" -f $_.Exception.Message)
+      }
+    }
     # sin clave debe dar 401
     try {
       Invoke-RestMethod -Uri "$($urls['grey'])/models" -TimeoutSec 15 | Out-Null
@@ -142,8 +156,8 @@ switch ($Action) {
     $name = Get-CodespaceName
     Set-PortsPublic $name
     & $gh codespace ssh -c $name -- "curl -fsSL -H 'Authorization: Bearer `$GH_PAT' https://raw.githubusercontent.com/$Repo/main/.devcontainer/mode-fenix.sh | bash" 2>&1 | Select-Object -Last 2
-    Write-Host "FENIX-LITE lanzando en :8890 (primera vez: descarga ~13.6 GiB)"
-    Write-Host "URL: usa .\jean-api.ps1 urls (puerto 8890) | volver: .\jean-api.ps1 standard-mode"
+    Write-Host "FENIX lanzando en :8890: el Codespace elige el GGUF que cabe en su RAM (si ninguno cabe, el router dice por que)"
+    Write-Host "estado: .\jean-api.ps1 test (linea router) | volver: .\jean-api.ps1 standard-mode"
   }
   "standard-mode" {
     $name = Get-CodespaceName

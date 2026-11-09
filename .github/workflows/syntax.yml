@@ -11,4 +11,6 @@ jobs:
             bash -n "$f" && echo "ok $f"
           done
       - name: python compile
-        run: python -m py_compile tools/*.py
+        run: python -m py_compile tools/*.py control/*.py
+      - name: router tests
+        run: python tests/test_router.py

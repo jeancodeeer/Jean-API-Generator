@@ -57,6 +57,12 @@ check_model() {
   FAILS[$port]=0
   # el servidor de control esta cargando un modelo en este puerto: no tocar
   [ -e "/tmp/jean-slot-${port}.lock" ] && return 0
+  # serve.sh dejo un motivo de fallo (p. ej. "Fenix no cabe en esta maquina"): reintentar solo
+  # cada 30 min, no cada minuto; el motivo lo muestra el router a JeanCode
+  local status="/tmp/jean-slot-${port}.status"
+  if [ -f "$status" ] && [ $(( $(date +%s) - $(stat -c %Y "$status" 2>/dev/null || echo 0) )) -lt 1800 ]; then
+    return 0
+  fi
   echo "[watchdog $(date -u +%FT%TZ)] $model (:${port}) no responde (code=${code:-none}); relanzando"
   pkill -f "llama-server.*--port ${port}" 2>/dev/null || true
   sleep 2
@@ -86,9 +92,21 @@ check_tunnel() {
   publish_urls
 }
 
+check_control() {
+  pgrep -f "control_server.py" >/dev/null 2>&1 && return 0
+  echo "[watchdog $(date -u +%FT%TZ)] router/control (:8899) caido; relanzando"
+  setsid nohup python3 "$ROOT/control/control_server.py" >> /tmp/control.log 2>&1 < /dev/null &
+}
+
 echo "[watchdog] arriba $(date -u +%FT%TZ)"
 while true; do
   sleep 60
+  check_control
+  # el modo se relee en cada vuelta: en modo fenix solo vive :8890 (Grey y Marvel no caben a la vez)
+  if [ "$(cat "$ROOT/.jean-mode" 2>/dev/null || echo standard)" = "fenix" ]; then
+    check_model fenix 8890
+    continue
+  fi
   check_model grey 8888
   MEM_MB=$(awk '/MemTotal/{print int($2/1024)}' /proc/meminfo 2>/dev/null || echo 0)
   if [ "$MEM_MB" -ge 14000 ]; then
