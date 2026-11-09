@@ -46,7 +46,17 @@ function Set-PortsPublic($name) {
   # Tras cada reinicio los puertos vuelven a "private" y SOLO se registran
   # al conectar por SSH (sin cliente VS Code). El ping SSH los despierta.
   & $gh codespace ssh -c $name -- "true" 2>&1 | Out-Null
-  & $gh codespace ports visibility 8888:public 8889:public 8890:public 8899:public -c $name 2>&1 | Out-Null
+  # Codespaces creados con una version anterior no registran el 8899 (router + control):
+  # un tunel de unos segundos hace que GitHub lo registre y ya se puede hacer publico.
+  $known = (& $gh codespace ports -c $name --json sourcePort 2>$null | ConvertFrom-Json) | ForEach-Object { $_.sourcePort }
+  if ($known -notcontains 8899) {
+    $fwd = Start-Process -FilePath $gh -ArgumentList @("codespace", "ports", "forward", "8899:18899", "-c", $name) -WindowStyle Hidden -PassThru
+    Start-Sleep 10
+    if (-not $fwd.HasExited) { Stop-Process -Id $fwd.Id -Force -ErrorAction SilentlyContinue }
+  }
+  foreach ($p in @(8888, 8889, 8890, 8899)) {
+    & $gh codespace ports visibility "$($p):public" -c $name 2>&1 | Out-Null  # uno a uno: un puerto ausente no tumba a los demas
+  }
 }
 
 function Get-Urls($name) {
