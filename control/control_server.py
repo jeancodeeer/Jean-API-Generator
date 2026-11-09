@@ -159,7 +159,12 @@ def load_job(job):
         job["state"] = "starting"
         stop_slot(slot)
         alias = job.get("alias") or alias_for(repo, file)
-        env = {"CUSTOM_FILE": rel, "CUSTOM_ALIAS": alias, "CUSTOM_CTX": str(job.get("ctx") or 16384)}
+        env = {"CUSTOM_FILE": rel, "CUSTOM_ALIAS": alias, "CUSTOM_CTX": str(int(job.get("ctx") or 16384))}
+        # defensa extra: el archivo lo lee watchdog.sh linea a linea (sin ejecutarlo), y aun asi
+        # solo se escriben valores con caracteres seguros
+        safe = re.compile(r"[A-Za-z0-9._/-]+")
+        if not all(safe.fullmatch(v) for v in (*env.values(), repo)):
+            raise RuntimeError("valores no seguros para el archivo del puerto")
         with open(slot_env_path(slot), "w", encoding="utf-8") as f:
             f.write("".join(f"{k}={v}\n" for k, v in env.items()) + f"REPO={repo}\n")
         launch(slot, env, "custom")
@@ -265,6 +270,18 @@ class Handler(BaseHTTPRequestHandler):
             if not REPO_RE.match(repo) or not FILE_RE.match(file) or ".." in file:
                 return self.reply(400, {"error": "repo o archivo invalido (debe ser un .gguf)"})
             token = data.get("hf_token") or None
+            # alias y ctx terminan en /tmp/jean-slot-<puerto>.env: solo valores inocuos
+            alias = data.get("alias")
+            if alias is not None and not re.fullmatch(r"[A-Za-z0-9._-]{1,64}", str(alias)):
+                return self.reply(400, {"error": "alias invalido (letras, numeros, . _ -; maximo 64)"})
+            try:
+                ctx = int(data.get("ctx") or 16384)
+            except (TypeError, ValueError):
+                return self.reply(400, {"error": "ctx debe ser un entero"})
+            if not 512 <= ctx <= 262144:
+                return self.reply(400, {"error": "ctx fuera de rango (512-262144)"})
+            if token is not None and not re.fullmatch(r"[A-Za-z0-9_-]{8,200}", str(token)):
+                return self.reply(400, {"error": "token de Hugging Face con formato invalido"})
             size = hf_file_size(repo, file, token)
             # comprobaciones de espacio: disco (mas 2 GB de margen) y RAM (modelo + ~1.5 GB)
             freed_disk = sum(os.path.getsize(os.path.join(r, f)) for r, _, fs in os.walk(os.path.join(CUSTOM_DIR, str(slot))) for f in fs)
@@ -280,7 +297,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(400, {"error": f"no cabe en RAM: el modelo pesa {size / 2**30:.1f} GB y quedan "
                                                  f"{(mem['MemAvailable'] + current) / 2**30:.1f} GB para ese puerto"})
             job = {"id": str(uuid.uuid4()), "slot": slot, "repo": repo, "file": file, "size": size, "downloaded": 0,
-                   "state": "queued", "token": token, "ctx": data.get("ctx"), "alias": data.get("alias"), "started": time.time()}
+                   "state": "queued", "token": token, "ctx": ctx, "alias": alias, "started": time.time()}
             with LOCK:
                 JOBS[job["id"]] = job
             threading.Thread(target=load_job, args=(job,), daemon=True).start()
