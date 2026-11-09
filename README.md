@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/social-preview.svg" alt="JEAN-API — free OpenAI-compatible API for the Jean GGUF models, served with llama.cpp on GitHub Codespaces" width="100%">
+<img src="assets/social-preview.svg" alt="JEAN-API-GENERATOR — free OpenAI-compatible API for the Jean GGUF models, served with llama.cpp on GitHub Codespaces" width="100%">
 
 <br>
 
@@ -14,19 +14,19 @@
 </div>
 
 ```
-N° 001 — JEAN-API                                                    REF. V0.7
+N° 001 — JEAN-API-GENERATOR                                          REF. V0.7
 Serve the Jean GGUF models as a free, OpenAI-compatible API.
 llama.cpp `llama-server` · GitHub Codespaces · CPU only · 128k context
 ```
 
 > [!TIP]
-> **Prefer a graphical client?** Point **[JeanCode](https://github.com/jeancodeeer/jeancode)** at your own `jean-api`: chat, a code generator with downloadable projects, and a desktop agent for Windows, macOS and Linux.
+> **Prefer a graphical client?** Point **[JeanCode](https://github.com/jeancodeeer/jeancode)** at your own `Jean-API-Generator`: chat, a code generator with downloadable projects, and a desktop agent for Windows, macOS and Linux.
 
 <br>
 
 ## 01 — WHAT IS THIS
 
-`jean-api` is the deployment layer for the **Jean v0.7** models (**Grey**, **Marvel** and **Fénix**, fine-tuned from Qwen3.5-27B and published as GGUF on Hugging Face). It turns a GitHub Codespace into a self-hosted LLM inference server that speaks the **OpenAI API** (`/v1/chat/completions`, `/v1/models`), so any OpenAI-compatible client, editor or coding agent can use the models by changing only the base URL and the API key.
+`Jean-API-Generator` is the deployment layer for the **Jean v0.7** models (**Grey**, **Marvel** and **Fénix**, fine-tuned from Qwen3.5-27B and published as GGUF on Hugging Face). It turns a GitHub Codespace into a self-hosted LLM inference server that speaks the **OpenAI API** (`/v1/chat/completions`, `/v1/models`), so any OpenAI-compatible client, editor or coding agent can use the models by changing only the base URL and the API key.
 
 Nothing runs on your own computer: your machine is just an HTTP client.
 
@@ -147,7 +147,7 @@ sudo bash oracle/setup-vm.sh --model fenix --api-key "…" # systemd service on 
 ## 06 — STRUCTURE
 
 ```
-jean-api/
+Jean-API-Generator/
 ├── serve.sh                 # download GGUF + launch llama-server (single source of server flags)
 ├── jean-api.ps1             # Windows control script (gh CLI)
 ├── .devcontainer/           # Codespaces: prep, autostart, watchdog, mode switches

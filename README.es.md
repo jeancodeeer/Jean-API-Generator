@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/social-preview.svg" alt="JEAN-API — API gratuita compatible con OpenAI para los modelos GGUF Jean, servida con llama.cpp en GitHub Codespaces" width="100%">
+<img src="assets/social-preview.svg" alt="JEAN-API-GENERATOR — API gratuita compatible con OpenAI para los modelos GGUF Jean, servida con llama.cpp en GitHub Codespaces" width="100%">
 
 <br>
 
@@ -14,19 +14,19 @@
 </div>
 
 ```
-N° 001 — JEAN-API                                                    REF. V0.7
+N° 001 — JEAN-API-GENERATOR                                          REF. V0.7
 Sirve los modelos GGUF Jean como una API gratuita compatible con OpenAI.
 llama.cpp `llama-server` · GitHub Codespaces · solo CPU · contexto 128k
 ```
 
 > [!TIP]
-> **¿Prefieres un cliente gráfico?** Conecta **[JeanCode](https://github.com/jeancodeeer/jeancode)** a tu propio `jean-api`: chat, un generador de código con proyectos descargables y un agente de escritorio para Windows, macOS y Linux.
+> **¿Prefieres un cliente gráfico?** Conecta **[JeanCode](https://github.com/jeancodeeer/jeancode)** a tu propio `Jean-API-Generator`: chat, un generador de código con proyectos descargables y un agente de escritorio para Windows, macOS y Linux.
 
 <br>
 
 ## 01 — QUÉ ES
 
-`jean-api` es la capa de despliegue de los modelos **Jean v0.7** (**Grey**, **Marvel** y **Fénix**, ajustados a partir de Qwen3.5-27B y publicados en GGUF en Hugging Face). Convierte un Codespace de GitHub en un servidor de inferencia de LLM autoalojado que habla la **API de OpenAI** (`/v1/chat/completions`, `/v1/models`): cualquier cliente, editor o agente de código compatible solo necesita cambiar la URL base y la clave.
+`Jean-API-Generator` es la capa de despliegue de los modelos **Jean v0.7** (**Grey**, **Marvel** y **Fénix**, ajustados a partir de Qwen3.5-27B y publicados en GGUF en Hugging Face). Convierte un Codespace de GitHub en un servidor de inferencia de LLM autoalojado que habla la **API de OpenAI** (`/v1/chat/completions`, `/v1/models`): cualquier cliente, editor o agente de código compatible solo necesita cambiar la URL base y la clave.
 
 Nada se ejecuta en tu equipo: tu PC solo es un cliente HTTP.
 
