@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Jean API en GitHub Codespaces (CPU).
-# Uso:  bash serve.sh {grey|marvel|fenix}
+# Uso:  bash serve.sh {grey|marvel|fenix|custom}
+#   custom: GGUF cargado por control/control_server.py; usa CUSTOM_FILE (ruta dentro de gguf/),
+#           CUSTOM_ALIAS y CUSTOM_CTX (default 16384). No descarga nada.
 #
 # Env:
 #   JEAN_API_KEY   (obligatorio) clave Bearer de la API
@@ -14,8 +16,8 @@ set -euo pipefail
 
 MODEL="${1:-grey}"
 case "$MODEL" in
-  grey|marvel|fenix) ;;
-  *) echo "uso: bash serve.sh {grey|marvel|fenix}" >&2; exit 1 ;;
+  grey|marvel|fenix|custom) ;;
+  *) echo "uso: bash serve.sh {grey|marvel|fenix|custom}" >&2; exit 1 ;;
 esac
 
 PORT="${PORT:-8888}"
@@ -33,7 +35,10 @@ FENIX_BASE_REPO="unsloth/Qwen3.5-27B-GGUF"
 FENIX_BASE_FILE="Qwen3.5-27B-Q4_K_M.gguf"
 FENIX_LORA_FILE="jean-fenix-v0.7.lora.gguf"
 
-if [ "$MODEL" = "fenix" ] && [ "${FENIX_LORA_MODE:-0}" != "1" ]; then
+if [ "$MODEL" = "custom" ]; then
+  FILE="${CUSTOM_FILE:?custom necesita CUSTOM_FILE}"
+  case "$FILE" in /*|*..*) echo "CUSTOM_FILE debe ser una ruta relativa dentro de gguf/" >&2; exit 1 ;; esac
+elif [ "$MODEL" = "fenix" ] && [ "${FENIX_LORA_MODE:-0}" != "1" ]; then
   # archivo UNICO publico (mergeado, 15.4 GiB)
   FILE="jean-fenix-v0.7.Q4_K_M.gguf"
 elif [ "$MODEL" = "fenix" ]; then
@@ -48,6 +53,7 @@ BASE="$(basename "$FILE" .gguf)"
 # en 16 GB debe bajarlo (4096-8192).
 CTX=131072
 [ "$MODEL" = "fenix" ] && CTX="${FENIX_CTX:-131072}"
+[ "$MODEL" = "custom" ] && CTX="${CUSTOM_CTX:-16384}"
 
 # ---------------------------------------------------------------- llama.cpp
 find_server() { find "$HOME/llama" -name llama-server -type f 2>/dev/null | head -1 || true; }
@@ -132,7 +138,9 @@ BIN=$(find_server)
 THREADS=$(nproc 2>/dev/null || echo 4)
 LORA_ARGS=()
 
-if [ "$MODEL" = "fenix" ]; then
+if [ "$MODEL" = "custom" ]; then
+  [ -s "$GGDIR/$FILE" ] || { echo "[serve] no existe $GGDIR/$FILE" >&2; exit 1; }
+elif [ "$MODEL" = "fenix" ]; then
   if [ "${FENIX_LORA_MODE:-0}" = "1" ]; then
     # modo ligero: base publica + LoRA (equivale al unificado)
     hf_get "$FENIX_BASE_REPO" "$FENIX_BASE_FILE" "$GGDIR/$FENIX_BASE_FILE" ""
@@ -151,8 +159,10 @@ else
   esac
 fi
 
-echo "[serve] jean-$MODEL en :$PORT (ctx $CTX, $THREADS hilos)"
+ALIAS="${FENIX_ALIAS:-jean-$MODEL}"
+[ "$MODEL" = "custom" ] && ALIAS="${CUSTOM_ALIAS:-custom}"
+echo "[serve] $ALIAS en :$PORT (ctx $CTX, $THREADS hilos)"
 exec "$BIN" -m "$GGDIR/$FILE" "${LORA_ARGS[@]}" --host 0.0.0.0 --port "$PORT" \
-  --alias "${FENIX_ALIAS:-jean-$MODEL}" -c "$CTX" --threads "$THREADS" \
+  --alias "$ALIAS" -c "$CTX" --threads "$THREADS" \
   -ctk q8_0 -ctv q8_0 \
   --temp 0.2 --top-p 0.9 --api-key "${JEAN_API_KEY:-}"

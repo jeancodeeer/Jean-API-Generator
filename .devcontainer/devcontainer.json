@@ -2,12 +2,33 @@
   "name": "jean-api",
   "image": "mcr.microsoft.com/devcontainers/python:3.12-bookworm",
   "features": {
-    "ghcr.io/devcontainers/features/sshd:1": { "version": "latest" }
+    "ghcr.io/devcontainers/features/sshd:1": {
+      "version": "latest"
+    }
   },
-  "forwardPorts": [8888, 8889],
+  "forwardPorts": [
+    8888,
+    8889,
+    8890,
+    8899
+  ],
   "portsAttributes": {
-    "8888": { "label": "jean-grey", "onAutoForward": "silent" },
-    "8889": { "label": "jean-marvel", "onAutoForward": "silent" }
+    "8888": {
+      "label": "jean-grey",
+      "onAutoForward": "silent"
+    },
+    "8889": {
+      "label": "jean-marvel",
+      "onAutoForward": "silent"
+    },
+    "8890": {
+      "label": "jean-fenix",
+      "onAutoForward": "silent"
+    },
+    "8899": {
+      "label": "jean-control",
+      "onAutoForward": "silent"
+    }
   },
   "postCreateCommand": "bash .devcontainer/prep.sh",
   "postStartCommand": "bash .devcontainer/autostart.sh",
