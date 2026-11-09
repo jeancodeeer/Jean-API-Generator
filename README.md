@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/social-preview.svg" alt="JEAN-API-GENERATOR — free OpenAI-compatible API for the Jean GGUF models, served with llama.cpp on GitHub Codespaces" width="100%">
+<img src="assets/social-preview.svg" alt="JEANCODE-API — free OpenAI-compatible API for the Jean GGUF models, served with llama.cpp on GitHub Codespaces" width="100%">
 
 <br>
 
@@ -14,7 +14,7 @@
 </div>
 
 ```
-N° 001 — JEAN-API-GENERATOR                                          REF. V0.7
+N° 001 — JEANCODE-API                                                REF. V0.7
 Serve the Jean GGUF models as a free, OpenAI-compatible API.
 llama.cpp `llama-server` · GitHub Codespaces · CPU only · 128k context
 ```
