@@ -62,7 +62,10 @@ check_model() {
   sleep 2
   # modelo personalizado (cargado desde JeanCode): se relanza el mismo, no el de Jean
   if [ -f "/tmp/jean-slot-${port}.env" ]; then
-    set -a; . "/tmp/jean-slot-${port}.env"; set +a
+    # se lee como texto KEY=VALUE (nunca se ejecuta con "."): solo tres claves conocidas
+    while IFS="=" read -r k v; do
+      case "$k" in CUSTOM_FILE|CUSTOM_ALIAS|CUSTOM_CTX) export "$k=$v" ;; esac
+    done < "/tmp/jean-slot-${port}.env"
     model=custom
   fi
   PORT="$port" JEAN_SOURCE="${JEAN_SOURCE:-hf}" JEAN_GGUF_DIR="$ROOT/gguf" \
