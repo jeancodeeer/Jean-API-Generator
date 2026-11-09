@@ -1,53 +1,78 @@
 <div align="center">
 
-<img src="assets/social-preview.svg" alt="jean-api: modelos GGUF Jean como API compatible con OpenAI con llama.cpp en GitHub Codespaces" width="760">
+<img src="assets/social-preview.svg" alt="JEAN-API — API gratuita compatible con OpenAI para los modelos GGUF Jean, servida con llama.cpp en GitHub Codespaces" width="100%">
 
-# jean-api
+<br>
 
-**Sirve los modelos GGUF Jean v0.7 como una API gratuita compatible con OpenAI usando `llama-server` de `llama.cpp` en un GitHub Codespace (solo CPU).**
+[![MODELOS](https://img.shields.io/badge/MODELOS-JEANCODER%2FJEAN--MODELS-ffffff?style=for-the-badge&labelColor=000000)](https://huggingface.co/JeanCoder/jean-models)
+[![MOTOR](https://img.shields.io/badge/MOTOR-LLAMA.CPP-ffffff?style=for-the-badge&labelColor=000000)](https://github.com/ggml-org/llama.cpp)
+![API](https://img.shields.io/badge/API-COMPATIBLE_OPENAI-ffffff?style=for-the-badge&labelColor=000000)
+[![CODESPACES](https://img.shields.io/badge/ABRIR_EN-CODESPACES-000000?style=for-the-badge&labelColor=ffffff&logo=github&logoColor=000000)](https://codespaces.new/jeancodeeer/jean-api)
 
-[![Modelos en Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20modelos-JeanCoder%2Fjean--models-yellow)](https://huggingface.co/JeanCoder/jean-models)
-[![llama.cpp](https://img.shields.io/badge/powered%20by-llama.cpp-blue)](https://github.com/ggml-org/llama.cpp)
-![OpenAI compatible](https://img.shields.io/badge/API-OpenAI--compatible-412991)
-[![Abrir en Codespaces](https://img.shields.io/badge/Codespaces-abrir-181717?logo=github)](https://codespaces.new/jeancodeeer/jean-api)
-
-[English](README.md) · Español
+[`ENGLISH`](README.md) · **`ESPAÑOL`**
 
 </div>
 
----
+```
+N° 001 — JEAN-API                                                    REF. V0.7
+Sirve los modelos GGUF Jean como una API gratuita compatible con OpenAI.
+llama.cpp `llama-server` · GitHub Codespaces · solo CPU · contexto 128k
+```
 
-## ¿Qué es?
+> [!TIP]
+> **¿Prefieres un cliente gráfico?** Conecta **[JeanCode](https://github.com/jeancodeeer/jeancode)** a tu propio `jean-api`: chat, un generador de código con proyectos descargables y un agente de escritorio para Windows, macOS y Linux.
+
+<br>
+
+## 01 — QUÉ ES
 
 `jean-api` es la capa de despliegue de los modelos **Jean v0.7** (**Grey**, **Marvel** y **Fénix**, ajustados a partir de Qwen3.5-27B y publicados en GGUF en Hugging Face). Convierte un Codespace de GitHub en un servidor de inferencia de LLM autoalojado que habla la **API de OpenAI** (`/v1/chat/completions`, `/v1/models`): cualquier cliente, editor o agente de código compatible solo necesita cambiar la URL base y la clave.
 
 Nada se ejecuta en tu equipo: tu PC solo es un cliente HTTP.
 
-## Qué hace (comprobable en el código)
+<br>
 
-- `serve.sh {grey|marvel|fenix}` descarga el GGUF y lanza `llama-server` con autenticación Bearer (`--api-key`).
-- Contexto de **128k** (`-c 131072`) con caché KV cuantizada (`-ctk q8_0 -ctv q8_0`).
-- Grey (`:8888`) y Marvel (`:8889`) caben a la vez en 16 GB (mediciones en [docs/HISTORY.md](docs/HISTORY.md)).
-- Arranque automático según la RAM disponible y *watchdog* que relanza servidores caídos (cada 60 s).
-- Modo persistente en `.jean-mode` (`standard` | `fenix`); los GGUF viven en `gguf/` y sobreviven a reinicios.
-- `generator/` (bash/PowerShell) y `oracle/setup-vm.sh` (systemd) para ejecutar lo mismo fuera de Codespaces.
-- `jean-api.ps1 start|stop|urls|test|status|fenix-mode|standard-mode` para controlar el Codespace desde Windows con `gh`.
+## 02 — QUÉ HACE
 
-## Modelos
+Comprobable en el código:
+
+| | |
+|---|---|
+| **`llama-server` por modelo** | `serve.sh {grey\|marvel\|fenix}` descarga el GGUF y lanza `llama-server` con autenticación Bearer (`--api-key`). |
+| **128k de contexto en CPU** | `-c 131072` con caché KV cuantizada (`-ctk q8_0 -ctv q8_0`). |
+| **Dos modelos a la vez** | Grey (`:8888`) y Marvel (`:8889`) caben juntos en 16 GB (mediciones en [docs/HISTORY.md](docs/HISTORY.md)). |
+| **Arranque y recuperación** | Arranque automático según la RAM disponible y *watchdog* que relanza servidores caídos cada 60 s. |
+| **Modo persistente** | `.jean-mode` (`standard` \| `fenix`); los GGUF viven en `gguf/` y sobreviven a reinicios. |
+| **Fuera de Codespaces** | `generator/` (bash/PowerShell) y `oracle/setup-vm.sh` (systemd). |
+| **Control desde Windows** | `jean-api.ps1 start\|stop\|urls\|test\|status\|fenix-mode\|standard-mode` con `gh`. |
+
+<br>
+
+## 03 — MODELOS
 
 Pesos públicos en **[JeanCoder/jean-models](https://huggingface.co/JeanCoder/jean-models)**.
 
-| Modelo | Alias | Rol | Tamaño (Q4_K_M) |
+| MODELO | ALIAS | ROL | TAMAÑO (Q4_K_M) |
 |---|---|---|---|
-| Jean Grey | `jean-grey` (:8888) | modelo de código principal | 2,52 GiB |
-| Jean Marvel | `jean-marvel` (:8889) | agente / segunda opinión | 4,36 GiB |
-| Jean Fénix | `jean-fenix` (:8890) | modelo grande (Qwen3.5-27B + LoRA) | 15,41 GiB |
+| **JEAN GREY** | `jean-grey` · `:8888` | modelo de código principal | 2,52 GiB |
+| **JEAN MARVEL** | `jean-marvel` · `:8889` | agente / segunda opinión | 4,36 GiB |
+| **JEAN FÉNIX** | `jean-fenix` | modelo grande (Qwen3.5-27B + LoRA) | 15,41 GiB |
 
-> Fénix no es usable en un Codespace gratuito de 16 GB (~100 s/token medido con la variante lite IQ3_M). Necesita una máquina ≥ 32 GB.
+> [!WARNING]
+> Fénix no es usable en un Codespace gratuito de 16 GB (~100 s/token medido con una variante reducida). Necesita una máquina ≥ 32 GB.
 
-## Inicio rápido
+<br>
 
-1. Crea un Codespace desde este repo.
+## 04 — INICIO RÁPIDO
+
+```
+[1] CREAR       →  Codespace desde este repo
+[2] SECRETS     →  JEAN_API_KEY  +  HF_TOKEN
+[3] INICIAR     →  autostart.sh lanza Grey (+ Marvel con ≥ 14 GB)
+[4] PUBLICAR    →  reenviar puertos 8888 / 8889 como públicos
+```
+
+1. Crea un Codespace desde este repo ([ábrelo aquí](https://codespaces.new/jeancodeeer/jean-api)).
 2. Añade los secrets `JEAN_API_KEY` (la clave que tú eliges) y `HF_TOKEN`.
 3. Inicia el Codespace: `autostart.sh` lanza Grey y, con ≥ 14 GB de RAM, Marvel.
 4. Reenvía los puertos 8888/8889 como públicos (los protege la clave).
@@ -58,12 +83,29 @@ curl -s "https://<tu-url-8888>/v1/chat/completions" \
   -d '{"model":"jean-grey","messages":[{"role":"user","content":"hola"}]}'
 ```
 
-Sin cabecera Bearer la API responde `401`; un `503` al despertar significa que el modelo aún está cargando.
+| RESPUESTA | SIGNIFICADO |
+|---|---|
+| `401` | falta la cabecera Bearer o la clave es incorrecta |
+| `503` al despertar | el modelo aún está cargando |
 
-## Estructura, límites y más
+<br>
+
+## 05 — ESTRUCTURA, LÍMITES Y MÁS
 
 La estructura del proyecto, los límites conocidos (el Codespace se duerme, solo CPU, 3 modelos a 128k no caben) y el roadmap están en el [README en inglés](README.md). La cronología con pruebas y decisiones está en [docs/HISTORY.md](docs/HISTORY.md).
 
-## Seguridad, contribuir y licencia
+<br>
+
+## 06 — SEGURIDAD · CONTRIBUIR · LICENCIA
 
 Ver [SECURITY.md](SECURITY.md) y [CONTRIBUTING.md](CONTRIBUTING.md). Todavía no hay archivo de licencia publicado; los pesos derivan de [Qwen3.5-27B](https://huggingface.co/unsloth/Qwen3.5-27B-GGUF), revisa su licencia antes de redistribuirlos.
+
+<div align="center">
+
+<br>
+
+```
+JEANCODER © 2026 — GREY ■ MARVEL ■ FÉNIX
+```
+
+</div>
