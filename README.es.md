@@ -7,7 +7,7 @@
 [![MODELOS](https://img.shields.io/badge/MODELOS-JEANCODER%2FJEAN--MODELS-ffffff?style=for-the-badge&labelColor=000000)](https://huggingface.co/JeanCoder/jean-models)
 [![MOTOR](https://img.shields.io/badge/MOTOR-LLAMA.CPP-ffffff?style=for-the-badge&labelColor=000000)](https://github.com/ggml-org/llama.cpp)
 ![API](https://img.shields.io/badge/API-COMPATIBLE_OPENAI-ffffff?style=for-the-badge&labelColor=000000)
-[![CODESPACES](https://img.shields.io/badge/ABRIR_EN-CODESPACES-000000?style=for-the-badge&labelColor=ffffff&logo=github&logoColor=000000)](https://codespaces.new/jeancodeeer/jean-api)
+[![CODESPACES](https://img.shields.io/badge/ABRIR_EN-CODESPACES-000000?style=for-the-badge&labelColor=ffffff&logo=github&logoColor=000000)](https://codespaces.new/jeancodeeer/Jean-API-Generator)
 
 [`ENGLISH`](README.md) · **`ESPAÑOL`**
 
@@ -72,7 +72,7 @@ Pesos públicos en **[JeanCoder/jean-models](https://huggingface.co/JeanCoder/je
 [4] PUBLICAR    →  reenviar puertos 8888 / 8889 como públicos
 ```
 
-1. Crea un Codespace desde este repo ([ábrelo aquí](https://codespaces.new/jeancodeeer/jean-api)).
+1. Crea un Codespace desde este repo ([ábrelo aquí](https://codespaces.new/jeancodeeer/Jean-API-Generator)).
 2. Añade los secrets `JEAN_API_KEY` (la clave que tú eliges) y `HF_TOKEN`.
 3. Inicia el Codespace: `autostart.sh` lanza Grey y, con ≥ 14 GB de RAM, Marvel.
 4. Reenvía los puertos 8888/8889 como públicos (los protege la clave).

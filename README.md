@@ -7,7 +7,7 @@
 [![MODELS](https://img.shields.io/badge/MODELS-JEANCODER%2FJEAN--MODELS-ffffff?style=for-the-badge&labelColor=000000)](https://huggingface.co/JeanCoder/jean-models)
 [![ENGINE](https://img.shields.io/badge/ENGINE-LLAMA.CPP-ffffff?style=for-the-badge&labelColor=000000)](https://github.com/ggml-org/llama.cpp)
 ![API](https://img.shields.io/badge/API-OPENAI--COMPATIBLE-ffffff?style=for-the-badge&labelColor=000000)
-[![CODESPACES](https://img.shields.io/badge/OPEN_IN-CODESPACES-000000?style=for-the-badge&labelColor=ffffff&logo=github&logoColor=000000)](https://codespaces.new/jeancodeeer/jean-api)
+[![CODESPACES](https://img.shields.io/badge/OPEN_IN-CODESPACES-000000?style=for-the-badge&labelColor=ffffff&logo=github&logoColor=000000)](https://codespaces.new/jeancodeeer/Jean-API-Generator)
 
 **`ENGLISH`** · [`ESPAÑOL`](README.es.md)
 
@@ -74,7 +74,7 @@ Weights are public on Hugging Face: **[JeanCoder/jean-models](https://huggingfac
 [4] PUBLISH     →  forward ports 8888 / 8889 as public
 ```
 
-1. **Create a Codespace** from this repository ([open it here](https://codespaces.new/jeancodeeer/jean-api)). The dev container installs `llama.cpp` (prebuilt CPU binary) and prepares the models.
+1. **Create a Codespace** from this repository ([open it here](https://codespaces.new/jeancodeeer/Jean-API-Generator)). The dev container installs `llama.cpp` (prebuilt CPU binary) and prepares the models.
 2. **Add Codespaces secrets** (repository or user level):
    - `JEAN_API_KEY` – the Bearer key your clients must send (you choose it).
    - `HF_TOKEN` – a Hugging Face token (`serve.sh` requires it for Grey and Marvel; Fénix downloads anonymously).
