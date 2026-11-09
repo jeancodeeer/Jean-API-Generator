@@ -239,9 +239,10 @@ $serverArgs = @(
     "--threads", "$Threads",
     "-ctk", "q8_0", "-ctv", "q8_0",
     "--temp", "0.2",
-    "--top-p", "0.9",
-    "--api-key", $ApiKey
+    "--top-p", "0.9"
 )
+# la clave va por entorno (LLAMA_API_KEY): como argumento se veria en la lista de procesos
+$env:LLAMA_API_KEY = $ApiKey
 if ($loraPath) { $serverArgs += @("--lora", $loraPath) }
 
 $outLog = Join-Path $LogDir ("jean-{0}-{1}.out.log" -f $Model, $Port)
@@ -250,6 +251,7 @@ $errLog = Join-Path $LogDir ("jean-{0}-{1}.err.log" -f $Model, $Port)
 Log ("lanzando jean-{0} en http://127.0.0.1:{1} (ctx {2}, {3} hilos)" -f $Model, $Port, $Ctx, $Threads)
 $proc = Start-Process -FilePath $exe -ArgumentList $serverArgs -NoNewWindow `
         -RedirectStandardOutput $outLog -RedirectStandardError $errLog -PassThru
+Remove-Item Env:LLAMA_API_KEY -ErrorAction SilentlyContinue  # el servidor ya la heredo; no queda en la sesion
 Start-Sleep -Seconds 2
 try { $proc.PriorityClass = 'BelowNormal' } catch { }
 

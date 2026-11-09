@@ -11,9 +11,9 @@ BIN=$(find "$HOME/llama" -name llama-server -type f | head -1)
 echo "bin: $BIN"
 
 launch() { # $1=archivo $2=puerto $3=alias
-  nohup "$BIN" -m "$HOME/gguf/$1" --host 0.0.0.0 --port "$2" --alias "$3" \
+  LLAMA_API_KEY="$JEAN_API_KEY" nohup "$BIN" -m "$HOME/gguf/$1" --host 0.0.0.0 --port "$2" --alias "$3" \
     -c 131072 -ctk q8_0 -ctv q8_0 --threads 4 --temp 0.2 --top-p 0.9 \
-    --api-key "$JEAN_API_KEY" > "/tmp/ctx-$2.log" 2>&1 &
+    > "/tmp/ctx-$2.log" 2>&1 &
   echo "lanzando $3 (puerto $2) ..."
 }
 

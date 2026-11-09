@@ -87,6 +87,8 @@ def fake_llama(alias, loading=False):
         def do_GET(self):
             if self.path == "/health":
                 return self.send_json(503 if loading else 200, {"status": "loading" if loading else "ok"})
+            if self.path == "/props":
+                return self.send_json(200, {"default_generation_settings": {"n_ctx": 131072}})
             if self.headers.get("Authorization") != f"Bearer {KEY}":
                 return self.send_json(401, {"error": "bad key"})
             self.send_json(200, {"data": [{"id": alias}]})
@@ -158,6 +160,7 @@ class EndToEnd(unittest.TestCase):
         j = json.loads(body)
         self.assertEqual(code, 200)
         self.assertEqual([m["id"] for m in j["data"]], ["jean-grey"])
+        self.assertEqual(j["data"][0]["jean"]["context_length"], 131072)
         reasons = {u["slot"]: u["reason"] for u in j["jean"]["unavailable"]}
         self.assertEqual(reasons["jean-marvel"], "cargando el modelo")
         self.assertEqual(reasons["jean-fenix"], "apagado")
