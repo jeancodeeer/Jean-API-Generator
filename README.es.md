@@ -20,7 +20,7 @@ llama.cpp `llama-server` · GitHub Codespaces · solo CPU · contexto 128k
 ```
 
 > [!TIP]
-> **¿Prefieres un cliente gráfico?** Conecta **[JeanCode](https://github.com/jeancodeeer/jeancode)** a tu propio `Jean-API-Generator`: chat, un generador de código con proyectos descargables y un agente de escritorio para Windows, macOS y Linux.
+> **¿Prefieres un cliente gráfico?** Conecta **[JeanCode](https://github.com/jeancodeeer/JeanCode)** a tu propio `Jean-API-Generator`: chat, un generador de código con proyectos descargables y un agente de escritorio para Windows, macOS y Linux.
 
 <br>
 

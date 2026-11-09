@@ -20,7 +20,7 @@ llama.cpp `llama-server` · GitHub Codespaces · CPU only · 128k context
 ```
 
 > [!TIP]
-> **Prefer a graphical client?** Point **[JeanCode](https://github.com/jeancodeeer/jeancode)** at your own `Jean-API-Generator`: chat, a code generator with downloadable projects, and a desktop agent for Windows, macOS and Linux.
+> **Prefer a graphical client?** Point **[JeanCode](https://github.com/jeancodeeer/JeanCode)** at your own `Jean-API-Generator`: chat, a code generator with downloadable projects, and a desktop agent for Windows, macOS and Linux.
 
 <br>
 
