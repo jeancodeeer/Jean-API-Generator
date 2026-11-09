@@ -205,7 +205,10 @@ ALIAS="${FENIX_ALIAS:-jean-$MODEL}"
 [ "$MODEL" = "custom" ] && ALIAS="${CUSTOM_ALIAS:-custom}"
 echo "[serve] $ALIAS en :$PORT (ctx $CTX, $THREADS hilos)"
 rm -f "$STATUS_FILE"
+# La clave va por entorno (LLAMA_API_KEY, que llama-server lee), NO como argumento: un argumento
+# se ve en la lista de procesos (ps, pgrep -af) y acababa copiado en ~/logs/status.md.
+export LLAMA_API_KEY="${JEAN_API_KEY:-}"
 exec "$BIN" -m "$GGDIR/$FILE" "${LORA_ARGS[@]}" --host 0.0.0.0 --port "$PORT" \
   --alias "$ALIAS" -c "$CTX" --threads "$THREADS" \
   -ctk q8_0 -ctv q8_0 \
-  --temp 0.2 --top-p 0.9 --api-key "${JEAN_API_KEY:-}"
+  --temp 0.2 --top-p 0.9

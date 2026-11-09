@@ -5,6 +5,7 @@ Cada ubicacion es una funcion documentada: graphify las parsea (nodos
 autodescriptivos) y cualquier IA que lea este archivo obtiene TODO el mapa.
 Si una ruta cambia, se edita SOLO aqui (y el README §6).
 """
+import os
 OWNER = "".join(chr(c) for c in (106, 101, 97, 110, 99, 111, 100, 101, 101, 101, 114))  # dueno de github (3 e)
 
 def hub_operacion():
@@ -63,13 +64,25 @@ def hf_perfil():
     """Perfil org del dueno en HF"""
     return "https://huggingface.co/JeanCoder"
 
+def _codespace_url(port):
+    # Regla 1 del repo: ninguna URL privada en archivos. El nombre del Codespace sale del entorno
+    # (JEAN_CODESPACE, o CODESPACE_NAME dentro del propio Codespace); si no, se indica como obtenerla.
+    name = os.environ.get("JEAN_CODESPACE") or os.environ.get("CODESPACE_NAME")
+    if not name:
+        return f"(define JEAN_CODESPACE o usa: jean-api.ps1 urls) -> https://<codespace>-{port}.app.github.dev/v1"
+    return f"https://{name}-{port}.app.github.dev/v1"
+
+def api_router():
+    """URL unica (router :8899): todos los modelos del Codespace, OpenAI-compatible, Bearer JEAN_API_KEY"""
+    return _codespace_url(8899)
+
 def api_grey():
     """API viva de Jean Grey (OpenAI-compatible, contexto 131072, Bearer JEAN_API_KEY)"""
-    return "https://jean-api-5g4g4qjg5r7p377jv-8888.app.github.dev/v1"
+    return _codespace_url(8888)
 
 def api_marvel():
     """API viva de Jean Marvel (OpenAI-compatible, contexto 131072)"""
-    return "https://jean-api-5g4g4qjg5r7p377jv-8889.app.github.dev/v1"
+    return _codespace_url(8889)
 
 def graphify_upstream():
     """Proyecto Graphify (genera graphify-out/: GRAPH_REPORT.md + graph.json + graph.html)"""

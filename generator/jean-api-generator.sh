@@ -222,9 +222,10 @@ fi
 OUTLOG="$LOGDIR/jean-$MODEL-$PORT.out.log"
 ERRLOG="$LOGDIR/jean-$MODEL-$PORT.err.log"
 log "lanzando jean-$MODEL en http://127.0.0.1:$PORT (ctx $CTX, $THREADS hilos)"
-nohup "$BIN" -m "$DEST" --host 127.0.0.1 --port "$PORT" --alias "jean-$MODEL" \
+# clave por entorno (LLAMA_API_KEY): como argumento se veria en la lista de procesos
+LLAMA_API_KEY="$API_KEY" nohup "$BIN" -m "$DEST" --host 127.0.0.1 --port "$PORT" --alias "jean-$MODEL" \
   -c "$CTX" --threads "$THREADS" -ctk q8_0 -ctv q8_0 \
-  --temp 0.2 --top-p 0.9 --api-key "$API_KEY" \
+  --temp 0.2 --top-p 0.9 \
   > "$OUTLOG" 2> "$ERRLOG" &
 SRV_PID=$!
 ( sleep 2; renice -n 10 -p "$SRV_PID" >/dev/null 2>&1 ) || true

@@ -81,7 +81,7 @@ class SlotTable:
 
     def __init__(self, slots, key, ttl=5.0, probe_timeout=4):
         self.slots, self.key, self.ttl, self.probe_timeout = slots, key, ttl, probe_timeout
-        self._at, self._ready, self._down = 0.0, {}, {}
+        self._at, self._ready, self._down, self._ctx = 0.0, {}, {}, {}
         self._lock = threading.Lock()
 
     def _probe(self, port):
@@ -102,30 +102,55 @@ class SlotTable:
         except Exception as e:
             return None, f"no lista modelos ({type(e).__name__})"
 
+    def _context(self, port):
+        """Contexto CONFIGURADO del llama-server (-c), de /props. None si no lo informa."""
+        try:
+            req = urllib.request.Request(f"http://127.0.0.1:{port}/props", headers={"Authorization": f"Bearer {self.key}"})
+            with urllib.request.urlopen(req, timeout=self.probe_timeout) as r:
+                j = json.loads(r.read())
+            n = (j.get("default_generation_settings") or {}).get("n_ctx") or j.get("n_ctx")
+            return int(n) if n else None
+        except Exception:
+            return None
+
     def snapshot(self, force=False):
         """Devuelve ({model: port}, {port: motivo}) de los puertos conocidos."""
         with self._lock:
             if force or time.time() - self._at > self.ttl:
-                ready, down = {}, {}
+                ready, down, ctx = {}, {}, {}
                 for port in self.slots:
                     ids, why = self._probe(port)
                     if ids:
+                        n = self._context(port)
                         for m in ids:
                             ready.setdefault(m, port)
+                            if n:
+                                ctx.setdefault(m, n)
                     else:
                         down[port] = why
-                self._ready, self._down, self._at = ready, down, time.time()
+                self._ready, self._down, self._ctx, self._at = ready, down, ctx, time.time()
             return dict(self._ready), dict(self._down)
+
+    def contexts(self):
+        with self._lock:
+            return dict(self._ctx)
 
     def invalidate(self):
         with self._lock:
             self._at = 0.0
 
 
-def models_payload(ready, down, slot_names, notes=None):
-    """Cuerpo de /v1/models: formato OpenAI, mas un campo jean con el estado de cada puerto."""
-    notes = notes or {}
-    data = [{"id": m, "object": "model", "owned_by": "jean-api-generator", "jean": {"port": p, "state": "ready"}}
+def models_payload(ready, down, slot_names, notes=None, contexts=None):
+    """Cuerpo de /v1/models: formato OpenAI, mas un campo jean con el estado de cada puerto
+    y el contexto configurado (context_length) cuando llama-server lo informa."""
+    notes, contexts = notes or {}, contexts or {}
+
+    def info(m, p):
+        j = {"port": p, "state": "ready"}
+        if contexts.get(m):
+            j["context_length"] = contexts[m]
+        return j
+    data = [{"id": m, "object": "model", "owned_by": "jean-api-generator", "jean": info(m, p)}
             for m, p in sorted(ready.items(), key=lambda kv: (rank(kv[0]), kv[0]))]
     unavailable = [{"slot": slot_names.get(p, str(p)), "port": p, "reason": notes.get(p) or why}
                    for p, why in sorted(down.items())]

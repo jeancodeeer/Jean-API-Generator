@@ -269,7 +269,7 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/v1/models":
             ready, down = TABLE.snapshot()
             return self.reply(200, router.models_payload(ready, down, {p: f"jean-{m}" for p, m in SLOTS.items()},
-                                                          slot_notes()))
+                                                          slot_notes(), TABLE.contexts()))
         if path == "/status":
             mem, du = meminfo(), shutil.disk_usage(GGDIR)
             slots = {}

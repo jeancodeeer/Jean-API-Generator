@@ -145,7 +145,7 @@ publish_status() {
     echo
     echo "## RAM"; free -m || true
     echo
-    echo "## procesos"; pgrep -af llama-server || echo "(ninguno)"
+    echo "## procesos"; pgrep -af llama-server | sed -E 's/(--api-key|-k) [^ ]+/\1 ***/g' || echo "(ninguno)"
     pgrep -af cloudflared || true
     echo
     # URLs: solo local (nada de nombres de codespace en este script)
