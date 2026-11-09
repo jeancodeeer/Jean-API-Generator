@@ -67,13 +67,13 @@ Pesos públicos en **[JeanCoder/jean-models](https://huggingface.co/JeanCoder/je
 
 ```
 [1] CREAR       →  Codespace desde este repo
-[2] SECRETS     →  JEAN_API_KEY  +  HF_TOKEN
+[2] SECRET      →  JEAN_API_KEY
 [3] INICIAR     →  autostart.sh lanza Grey (+ Marvel con ≥ 14 GB)
 [4] PUBLICAR    →  reenviar puertos 8888 / 8889 como públicos
 ```
 
 1. Crea un Codespace desde este repo ([ábrelo aquí](https://codespaces.new/jeancodeeer/Jean-API-Generator)).
-2. Añade los secrets `JEAN_API_KEY` (la clave que tú eliges) y `HF_TOKEN`.
+2. Añade el secret `JEAN_API_KEY` (la clave que tú eliges). `HF_TOKEN` es opcional: los modelos son públicos.
 3. Inicia el Codespace: `autostart.sh` lanza Grey y, con ≥ 14 GB de RAM, Marvel.
 4. Reenvía los puertos 8888/8889 como públicos (los protege la clave).
 

@@ -4,7 +4,7 @@
 #
 # Env:
 #   JEAN_API_KEY   (obligatorio) clave Bearer de la API
-#   HF_TOKEN       token HF (repo privado de modelos)
+#   HF_TOKEN       token HF (opcional: JeanCoder/jean-models es publico)
 #   JEAN_SOURCE    hf (default) | github   (de dónde bajar los GGUF)
 #   JEAN_REPO      repo HF de modelos       (default JeanCoder/jean-models)
 #   JEAN_GH_REPO   repo GitHub del release  (default jeancodeeer/jean-api)
@@ -143,7 +143,7 @@ if [ "$MODEL" = "fenix" ]; then
   fi
 else
   case "$SRC" in
-    hf)     hf_get "$HF_REPO" "$FILE" "$GGDIR/$FILE" "${HF_TOKEN:?falta HF_TOKEN}" ;;
+    hf)     hf_get "$HF_REPO" "$FILE" "$GGDIR/$FILE" "${HF_TOKEN:-}" ;;
     github) download_github ;;
     *) echo "JEAN_SOURCE invalido: $SRC" >&2; exit 1 ;;
   esac
