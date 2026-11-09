@@ -35,16 +35,26 @@ publish_urls() {
   rm -f "$tmp"
 }
 
+declare -A FAILS=()
 check_model() {
   local model="$1" port="$2"
   local code
-  code=$(curl -s -o /dev/null -w '%{http_code}' -m 6 \
-    -H "Authorization: Bearer ${JEAN_API_KEY:-}" \
-    "http://localhost:$port/v1/models" 2>/dev/null || true)
-  # 503 = cargando el modelo: normal, no relanzar
+  # /health no requiere clave y responde aunque el modelo este generando.
+  # 200 = listo, 503 = cargando: ambos son un servidor vivo.
+  code=$(curl -s -o /dev/null -w '%{http_code}' -m 20 \
+    "http://localhost:$port/health" 2>/dev/null || true)
   if [ "$code" = "200" ] || [ "$code" = "503" ]; then
+    FAILS[$port]=0
     return 0
   fi
+  # Un modelo en CPU ocupado puede tardar en contestar: solo se relanza
+  # tras 3 comprobaciones fallidas seguidas (~3 minutos) o si el proceso no existe.
+  FAILS[$port]=$(( ${FAILS[$port]:-0} + 1 ))
+  if pgrep -f "llama-server.*--port ${port}" >/dev/null 2>&1 && [ "${FAILS[$port]}" -lt 3 ]; then
+    echo "[watchdog $(date -u +%FT%TZ)] $model (:${port}) sin respuesta (code=${code:-none}, ${FAILS[$port]}/3); espero"
+    return 0
+  fi
+  FAILS[$port]=0
   echo "[watchdog $(date -u +%FT%TZ)] $model (:${port}) no responde (code=${code:-none}); relanzando"
   pkill -f "llama-server.*--port ${port}" 2>/dev/null || true
   sleep 2
