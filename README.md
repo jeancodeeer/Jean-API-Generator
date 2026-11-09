@@ -69,7 +69,7 @@ Weights are public on Hugging Face: **[JeanCoder/jean-models](https://huggingfac
 
 ```
 [1] CREATE      →  Codespace from this repo
-[2] SECRETS     →  JEAN_API_KEY  +  HF_TOKEN
+[2] SECRET      →  JEAN_API_KEY
 [3] START       →  autostart.sh launches Grey (+ Marvel with ≥ 14 GB)
 [4] PUBLISH     →  forward ports 8888 / 8889 as public
 ```
@@ -77,7 +77,7 @@ Weights are public on Hugging Face: **[JeanCoder/jean-models](https://huggingfac
 1. **Create a Codespace** from this repository ([open it here](https://codespaces.new/jeancodeeer/Jean-API-Generator)). The dev container installs `llama.cpp` (prebuilt CPU binary) and prepares the models.
 2. **Add Codespaces secrets** (repository or user level):
    - `JEAN_API_KEY` – the Bearer key your clients must send (you choose it).
-   - `HF_TOKEN` – a Hugging Face token (`serve.sh` requires it for Grey and Marvel; Fénix downloads anonymously).
+   - `HF_TOKEN` – optional; the models repo is public, so every model downloads anonymously.
 3. **Start / restart the Codespace.** `postStartCommand` runs `.devcontainer/autostart.sh`, which launches Grey on `:8888` and, with ≥ 14 GB RAM, Marvel on `:8889`.
 4. **Make the ports reachable.** Ports 8888/8889 must be forwarded as *public* (the API key protects them). If `GH_PAT` is set as a secret, the Codespace also records its Cloudflare fallback URLs in `~/logs/urls.txt`.
 
@@ -85,7 +85,6 @@ Run a single model by hand inside the Codespace:
 
 ```bash
 export JEAN_API_KEY=choose-a-long-random-key
-export HF_TOKEN=hf_...
 PORT=8888 bash serve.sh grey
 ```
 
