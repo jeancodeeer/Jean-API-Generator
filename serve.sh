@@ -5,7 +5,8 @@
 #           CUSTOM_ALIAS y CUSTOM_CTX (default 16384). No descarga nada.
 #
 # Env:
-#   JEAN_API_KEY   (obligatorio) clave Bearer de la API
+#   JEAN_API_KEY   (obligatorio) clave Bearer de la API; sin ella no arranca
+#   FENIX_FILE     GGUF de Fenix (default: el mas grande publicado que cabe en la RAM)
 #   HF_TOKEN       token HF (opcional: JeanCoder/jean-models es publico)
 #   JEAN_SOURCE    hf (default) | github   (de dónde bajar los GGUF)
 #   JEAN_REPO      repo HF de modelos       (default JeanCoder/jean-models)
@@ -21,6 +22,14 @@ case "$MODEL" in
 esac
 
 PORT="${PORT:-8888}"
+# Motivo de fallo para el router (/v1/models lo muestra en "unavailable"). Se borra al arrancar bien.
+STATUS_FILE="/tmp/jean-slot-${PORT}.status"
+fail() { echo "[serve] $*" >&2; echo "$*" > "$STATUS_FILE"; exit 1; }
+
+# Sin clave, llama-server serviria el puerto PUBLICO sin autenticacion: nunca.
+if [ -z "${JEAN_API_KEY:-}" ] && [ "${JEAN_ALLOW_NO_KEY:-0}" != "1" ]; then
+  fail "falta JEAN_API_KEY: no sirvo un puerto sin clave (JEAN_ALLOW_NO_KEY=1 solo para pruebas locales)"
+fi
 SRC="${JEAN_SOURCE:-hf}"
 GH_REPO="${JEAN_GH_REPO:-jeancodeeer/jean-api}"
 GH_TAG="${JEAN_GH_TAG:-v0.7-models}"
@@ -130,16 +139,45 @@ print("[serve] sha256 OK")
 PY
 }
 
+# Fenix: elige el GGUF de Fenix publicado en HF que mejor cabe en la RAM de esta maquina
+# (deja ~3 GB para el KV y el sistema). Nuevas versiones (v0.8 IQ2_M...) se usan solas al publicarse.
+fenix_pick() {
+  local mem_kb="${JEAN_MEM_KB:-$(awk '/MemTotal/{print $2}' /proc/meminfo 2>/dev/null || echo 0)}"
+  curl -fsSL --max-time 30 "https://huggingface.co/api/models/$HF_REPO/tree/main" 2>/dev/null     | python3 -c '
+import json, sys
+mem, status = int(sys.argv[1]) * 1024, sys.argv[2]
+def fail(msg):
+    open(status, "w").write(msg + chr(10))
+    sys.exit("[serve] " + msg)
+try:
+    tree = json.load(sys.stdin)
+except ValueError:
+    fail("no pude leer la lista de modelos de Hugging Face (sin red?)")
+files = [(f.get("lfs", {}).get("size") or f.get("size", 0), f["path"]) for f in tree
+         if f.get("type") == "file" and f["path"].startswith("jean-fenix") and f["path"].endswith(".gguf")
+         and ".lora." not in f["path"]]
+if not files:
+    fail("no hay ningun GGUF de Fenix publicado en el repo de modelos")
+fit = [f for f in files if f[0] + 3 * 2**30 <= mem]
+if not fit:
+    small = min(files)
+    fail(f"Fenix no cabe en esta maquina: el archivo mas pequeno ({small[1]}) pesa "
+         f"{small[0] / 2**30:.1f} GB y hay {mem / 2**30:.0f} GB de RAM. Usa una maquina de 32 GB.")
+fit.sort(key=lambda f: (f[1].split(".")[0], f[0]))   # version mas nueva y, dentro de ella, el mas grande
+print(fit[-1][1])
+' "$mem_kb" "$STATUS_FILE"
+}
+
 # ---------------------------------------------------------------- main
 BIN=$(find_server)
 [ -n "$BIN" ] || { install_llama; BIN=$(find_server); }
-[ -n "$BIN" ] || { echo "no pude instalar llama-server" >&2; exit 1; }
+[ -n "$BIN" ] || fail "no pude instalar llama-server"
 
 THREADS=$(nproc 2>/dev/null || echo 4)
 LORA_ARGS=()
 
 if [ "$MODEL" = "custom" ]; then
-  [ -s "$GGDIR/$FILE" ] || { echo "[serve] no existe $GGDIR/$FILE" >&2; exit 1; }
+  [ -s "$GGDIR/$FILE" ] || fail "no existe gguf/$FILE"
 elif [ "$MODEL" = "fenix" ]; then
   if [ "${FENIX_LORA_MODE:-0}" = "1" ]; then
     # modo ligero: base publica + LoRA (equivale al unificado)
@@ -147,9 +185,13 @@ elif [ "$MODEL" = "fenix" ]; then
     hf_get "$HF_REPO" "$FENIX_LORA_FILE" "$GGDIR/$FENIX_LORA_FILE" ""
     LORA_ARGS=(--lora "$GGDIR/$FENIX_LORA_FILE")
   else
-    FILE="${FENIX_FILE:-jean-fenix-v0.7.Q4_K_M.gguf}"
+    FILE="${FENIX_FILE:-}"
+    if [ -z "$FILE" ]; then
+      FILE=$(fenix_pick) || exit 1
+      echo "[serve] fenix: $FILE (el mas grande que cabe en esta maquina)"
+    fi
     BASE="$(basename "$FILE" .gguf)"
-    hf_get "$HF_REPO" "$FILE" "$GGDIR/$FILE" ""
+    hf_get "$HF_REPO" "$FILE" "$GGDIR/$FILE" "" || fail "no pude bajar $FILE de $HF_REPO"
   fi
 else
   case "$SRC" in
@@ -162,6 +204,7 @@ fi
 ALIAS="${FENIX_ALIAS:-jean-$MODEL}"
 [ "$MODEL" = "custom" ] && ALIAS="${CUSTOM_ALIAS:-custom}"
 echo "[serve] $ALIAS en :$PORT (ctx $CTX, $THREADS hilos)"
+rm -f "$STATUS_FILE"
 exec "$BIN" -m "$GGDIR/$FILE" "${LORA_ARGS[@]}" --host 0.0.0.0 --port "$PORT" \
   --alias "$ALIAS" -c "$CTX" --threads "$THREADS" \
   -ctk q8_0 -ctv q8_0 \

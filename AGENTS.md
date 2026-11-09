@@ -40,6 +40,10 @@ Fuente completa y actualizada: `tools/project_map.py` (parseable por Graphify) y
 - **Web**: perfil `https://github.com/jeancodeeer` · repos `jean-api`, `librecodigo`, `kanye-nest` ·
   HF `https://huggingface.co/JeanCoder` · APIs vivas (Grey :8888, Marvel :8889, Fénix-lite :8890 en modo fenix).
 
+8. **Router en :8899** (`control/router.py`): URL única OpenAI-compatible para todos los puertos.
+   Nunca cambia de modelo en silencio (503 + lista de disponibles). Pruebas: `python tests/test_router.py`.
+   `serve.sh` escribe en `/tmp/jean-slot-<puerto>.status` por qué un puerto no arrancó; el router lo muestra.
+
 ## Comandos rápidos
 - PC: `D:\jean-work\jean-api.ps1 start|stop|urls|test|status|fenix-mode|standard-mode`
 - dentro del Codespace: `bash tests/test_ctx.sh` (verifica ctx 131072), `bash tests/diag.sh`

@@ -88,6 +88,15 @@ curl -s "https://<tu-url-8888>/v1/chat/completions" \
 | `401` | falta la cabecera Bearer o la clave es incorrecta |
 | `503` al despertar | el modelo aún está cargando |
 
+### Una sola URL: el router (puerto 8899)
+
+`https://<codespace>-8899.app.github.dev/v1` muestra todos los modelos del Codespace, incluidos los GGUF que cargues desde Hugging Face con [JeanCode](https://github.com/jeancodeeer/JeanCode).
+- `"model": "auto"` elige el primero listo (grey > marvel > fenix).
+- Si un modelo no está disponible, responde `503` con la lista de los que sí lo están. Nunca cambia de modelo a escondidas.
+- `/v1/models` dice qué puerto está caído y por qué, por ejemplo «Fénix no cabe en esta RAM».
+- En modo Fénix, el Codespace elige en Hugging Face el GGUF de Fénix que cabe en su memoria.
+- `serve.sh` no arranca sin `JEAN_API_KEY`.
+
 <br>
 
 ## 05 — ESTRUCTURA, LÍMITES Y MÁS

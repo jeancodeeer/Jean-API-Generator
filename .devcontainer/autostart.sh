@@ -22,19 +22,36 @@ if [ -z "${JEAN_API_KEY:-}" ]; then
   exit 0
 fi
 
+# Router + control (:8899) y watchdog: en TODOS los modos. El router es la URL unica para
+# JeanCode (todos los modelos, incluidos los GGUF de Hugging Face cargados desde el cliente).
+start_services() {
+  if ! pgrep -f "control_server.py" >/dev/null 2>&1; then
+    setsid nohup python3 "$ROOT/control/control_server.py" > /tmp/control.log 2>&1 < /dev/null &
+    echo "[autostart] router + control en :8899"
+  fi
+  if ! pgrep -f "watchdog.sh" >/dev/null 2>&1; then
+    setsid nohup bash "$HERE/watchdog.sh" > /tmp/watchdog.log 2>&1 < /dev/null &
+    echo "[autostart] watchdog lanzado"
+  fi
+}
+
 # Modo guardado en el WORKSPACE (persiste entre rebuilds):
-#   echo fenix > "$ROOT/.jean-mode"  -> solo fenix-lite en :8890
+#   echo fenix > "$ROOT/.jean-mode"  -> solo fenix en :8890 (el GGUF que quepa en la RAM)
 #   rm "$ROOT/.jean-mode"            -> estandar (grey + marvel)
 MODE_FILE="$ROOT/.jean-mode"
 MODE=$(cat "$MODE_FILE" 2>/dev/null || echo standard)
 if [ "$MODE" = "fenix" ]; then
   mkdir -p "$ROOT/gguf"
-  PORT=8890 JEAN_SOURCE=hf JEAN_GGUF_DIR="$ROOT/gguf" \
-    FENIX_FILE="${FENIX_FILE:-jean-fenix-v0.7.lite-IQ3_M.gguf}" \
-    FENIX_ALIAS=jean-fenix-lite FENIX_CTX="${FENIX_CTX:-8192}" \
-    setsid nohup bash "$ROOT/serve.sh" fenix > "$ROOT/.autostart-fenix.log" 2>&1 < /dev/null &
+  # FENIX_FILE vacio = serve.sh elige en Hugging Face el GGUF de Fenix que cabe en esta RAM;
+  # si ninguno cabe, el motivo aparece en el router (/v1/models -> jean.unavailable)
+  if ! pgrep -f "llama-server.*--port 8890" >/dev/null 2>&1; then
+    PORT=8890 JEAN_SOURCE=hf JEAN_GGUF_DIR="$ROOT/gguf" \
+      FENIX_FILE="${FENIX_FILE:-}" FENIX_CTX="${FENIX_CTX:-8192}" \
+      setsid nohup bash "$ROOT/serve.sh" fenix > /tmp/serve-fenix.log 2>&1 < /dev/null &
+  fi
   [ -x "$HOME/bin/cloudflared" ] && setsid nohup "$HOME/bin/cloudflared" tunnel --url http://localhost:8890 --no-autoupdate > /tmp/cf-fenix.log 2>&1 &
-  echo "[autostart] modo FENIX-LITE en :8890 (persistente via $MODE_FILE)"
+  start_services
+  echo "[autostart] modo FENIX en :8890 (persistente via $MODE_FILE)"
   exit 0
 fi
 
@@ -114,16 +131,8 @@ start_tunnel 8888 grey
 [ "$MEM_MB" -ge 14000 ] && start_tunnel 8889 marvel
 [ "$MEM_MB" -ge 30000 ] && start_tunnel 8890 fenix
 
-# watchdog: relanza un modelo si deja de responder
-if ! pgrep -f "watchdog.sh" >/dev/null 2>&1; then
-  setsid nohup bash "$HERE/watchdog.sh" > /tmp/watchdog.log 2>&1 &
-# servidor de control (:8899): JeanCode carga modelos de Hugging Face sin entrar al Codespace
-if ! pgrep -f "control_server.py" >/dev/null 2>&1; then
-  setsid nohup python3 "$ROOT/control/control_server.py" > /tmp/control.log 2>&1 < /dev/null &
-  echo "[autostart] control en :8899"
-fi
-  echo "[autostart] watchdog lanzado"
-fi
+# watchdog (relanza modelos caidos) + router/control (:8899: URL unica y carga de modelos de HF)
+start_services
 
 # --- status para depurar sin SSH -------------------------------------------
 publish_status() {
