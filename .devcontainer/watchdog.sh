@@ -58,7 +58,7 @@ check_model() {
   echo "[watchdog $(date -u +%FT%TZ)] $model (:${port}) no responde (code=${code:-none}); relanzando"
   pkill -f "llama-server.*--port ${port}" 2>/dev/null || true
   sleep 2
-  PORT="$port" JEAN_SOURCE="${JEAN_SOURCE:-hf}" \
+  PORT="$port" JEAN_SOURCE="${JEAN_SOURCE:-hf}" JEAN_GGUF_DIR="$ROOT/gguf" \
     setsid nohup bash "$ROOT/serve.sh" "$model" >> "/tmp/serve-$model.log" 2>&1 &
 }
 

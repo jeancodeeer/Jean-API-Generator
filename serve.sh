@@ -23,7 +23,9 @@ SRC="${JEAN_SOURCE:-hf}"
 GH_REPO="${JEAN_GH_REPO:-jeancodeeer/jean-api}"
 GH_TAG="${JEAN_GH_TAG:-v0.7-models}"
 HF_REPO="${JEAN_REPO:-JeanCoder/jean-models}"
-GGDIR="${JEAN_GGUF_DIR:-$HOME/gguf}"
+# los GGUF viven en gguf/ del workspace (persiste entre rebuilds); nunca en $HOME,
+# o un relanzamiento vuelve a descargarlos y llena el disco
+GGDIR="${JEAN_GGUF_DIR:-$(cd "$(dirname "$0")" && pwd)/gguf}"
 mkdir -p "$GGDIR"
 
 # Fenix = Qwen3.5-27B (base publica) + LoRA entrenado de Jean.

@@ -3,20 +3,20 @@
 # arranque de la API tarde segundos, no minutos. Idempotente.
 set -uo pipefail
 
-mkdir -p "$HOME/gguf"
+GGDIR="$(cd "$(dirname "$0")/.." && pwd)/gguf"   # workspace: persiste entre rebuilds
+mkdir -p "$GGDIR"
 
-if [ -n "${HF_TOKEN:-}" ]; then
-  for f in jean-grey-v0.7.Q4_K_M.gguf jean-marvel-v0.7.Q4_K_M.gguf; do
-    [ -s "$HOME/gguf/$f" ] && continue
-    echo "[prep] bajando $f desde HF ..."
-    curl -fL --retry 3 -C - -H "Authorization: Bearer $HF_TOKEN" \
-      "https://huggingface.co/${JEAN_MODEL_REPO:-JeanCoder/jean-models}/resolve/main/$f" \
-      -o "$HOME/gguf/$f.part" && mv "$HOME/gguf/$f.part" "$HOME/gguf/$f" \
-      || echo "[prep] $f fallo (se baja on-demand)"
-  done
-else
-  echo "[prep] sin HF_TOKEN: modelos on-demand"
-fi
+AUTH=()
+[ -n "${HF_TOKEN:-}" ] && AUTH=(-H "Authorization: Bearer $HF_TOKEN")
+for f in jean-grey-v0.7.Q4_K_M.gguf jean-marvel-v0.7.Q4_K_M.gguf; do
+  [ -s "$GGDIR/$f" ] && continue
+  echo "[prep] bajando $f desde HF ..."
+  rm -f "$GGDIR/$f.part"
+  curl -fL --retry 3 "${AUTH[@]}" \
+    "https://huggingface.co/${JEAN_MODEL_REPO:-JeanCoder/jean-models}/resolve/main/$f" \
+    -o "$GGDIR/$f.part" && mv "$GGDIR/$f.part" "$GGDIR/$f" \
+    || echo "[prep] $f fallo (se baja on-demand)"
+done
 
 if [ -z "$(find "$HOME/llama" -name llama-server -type f 2>/dev/null | head -1)" ]; then
   echo "[prep] instalando llama.cpp prebuilt (CPU) ..."
@@ -30,4 +30,4 @@ if [ -z "$(find "$HOME/llama" -name llama-server -type f 2>/dev/null | head -1)"
 fi
 
 echo "[prep] llama-server: $(find "$HOME/llama" -name llama-server -type f 2>/dev/null | head -1)"
-ls -la "$HOME/gguf" 2>/dev/null | head -5
+ls -la "$GGDIR" 2>/dev/null | head -5
