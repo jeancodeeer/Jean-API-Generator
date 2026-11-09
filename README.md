@@ -143,6 +143,21 @@ sudo bash oracle/setup-vm.sh --model fenix --api-key "…" # systemd service on 
 
 <br>
 
+## 05b — LOAD ANY HUGGING FACE MODEL (CONTROL SERVER)
+
+`control/control_server.py` listens on **:8899** (started by `autostart.sh`, protected by your `JEAN_API_KEY`). A client such as **[JeanCode](https://github.com/jeancodeeer/JeanCode)** uses it to put any GGUF from Hugging Face on one of the model ports without opening the Codespace:
+
+| METHOD | PATH | WHAT IT DOES |
+|---|---|---|
+| `GET` | `/status` | model per port, free RAM and disk, downloads in progress |
+| `POST` | `/load` `{repo, file, slot, hf_token?, ctx?}` | checks disk and RAM, downloads the GGUF to `gguf/custom/` and serves it with `serve.sh custom` |
+| `GET` | `/jobs/<id>` | download progress |
+| `POST` | `/restore` `{slot}` | back to the Jean model of that port |
+
+`slot` is `8888`, `8889` or `8890`. An HF token, when sent, is used only for that download and never written to disk. Make port 8899 public together with the model ports (`jean-api.ps1 start` does it). After a Codespace restart the Jean models come back.
+
+<br>
+
 ## 06 — STRUCTURE
 
 ```

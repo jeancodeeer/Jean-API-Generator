@@ -117,6 +117,11 @@ start_tunnel 8888 grey
 # watchdog: relanza un modelo si deja de responder
 if ! pgrep -f "watchdog.sh" >/dev/null 2>&1; then
   setsid nohup bash "$HERE/watchdog.sh" > /tmp/watchdog.log 2>&1 &
+# servidor de control (:8899): JeanCode carga modelos de Hugging Face sin entrar al Codespace
+if ! pgrep -f "control_server.py" >/dev/null 2>&1; then
+  setsid nohup python3 "$ROOT/control/control_server.py" > /tmp/control.log 2>&1 < /dev/null &
+  echo "[autostart] control en :8899"
+fi
   echo "[autostart] watchdog lanzado"
 fi
 

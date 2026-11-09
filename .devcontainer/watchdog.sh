@@ -55,9 +55,16 @@ check_model() {
     return 0
   fi
   FAILS[$port]=0
+  # el servidor de control esta cargando un modelo en este puerto: no tocar
+  [ -e "/tmp/jean-slot-${port}.lock" ] && return 0
   echo "[watchdog $(date -u +%FT%TZ)] $model (:${port}) no responde (code=${code:-none}); relanzando"
   pkill -f "llama-server.*--port ${port}" 2>/dev/null || true
   sleep 2
+  # modelo personalizado (cargado desde JeanCode): se relanza el mismo, no el de Jean
+  if [ -f "/tmp/jean-slot-${port}.env" ]; then
+    set -a; . "/tmp/jean-slot-${port}.env"; set +a
+    model=custom
+  fi
   PORT="$port" JEAN_SOURCE="${JEAN_SOURCE:-hf}" JEAN_GGUF_DIR="$ROOT/gguf" \
     setsid nohup bash "$ROOT/serve.sh" "$model" >> "/tmp/serve-$model.log" 2>&1 &
 }

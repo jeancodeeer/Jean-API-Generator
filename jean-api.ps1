@@ -46,7 +46,7 @@ function Set-PortsPublic($name) {
   # Tras cada reinicio los puertos vuelven a "private" y SOLO se registran
   # al conectar por SSH (sin cliente VS Code). El ping SSH los despierta.
   & $gh codespace ssh -c $name -- "true" 2>&1 | Out-Null
-  & $gh codespace ports visibility 8888:public 8889:public -c $name 2>&1 | Out-Null
+  & $gh codespace ports visibility 8888:public 8889:public 8890:public 8899:public -c $name 2>&1 | Out-Null
 }
 
 function Get-Urls($name) {
