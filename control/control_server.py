@@ -8,6 +8,7 @@ de modelo del Codespace, sin entrar al Codespace. Solo biblioteca estandar.
   POST /load    {repo, file, slot, hf_token?, ctx?}   descarga y sirve el GGUF en ese puerto
   POST /restore {slot}          vuelve a servir el modelo Jean original de ese puerto
   GET  /jobs/<id>               progreso de una descarga
+  GET|POST /relay/<host>/<ruta>  relay CORS hacia APIs conocidas (X-Jean-Key = JEAN_API_KEY)
   GET  /health                  publico: {"ok": true, "ready": N} (sin datos del sistema)
   GET  /v1/models  POST /v1/chat/completions ...   router OpenAI-compatible (ver router.py):
                                 una sola URL para todos los modelos del Codespace
@@ -46,6 +47,8 @@ FILE_RE = re.compile(r"^[\w][\w./-]{0,250}\.gguf$")
 JOBS = {}
 LOCK = threading.Lock()
 TABLE = router.SlotTable(list(SLOTS), KEY)
+RELAY_HOSTS = router.relay_hosts(os.environ.get("JEAN_RELAY_HOSTS", ""))
+RELAY_LOCAL_HTTP = os.environ.get("JEAN_RELAY_TEST_LOCAL_HTTP") == "1"  # solo pruebas
 
 
 def slot_status_path(slot):
@@ -221,7 +224,7 @@ class Handler(BaseHTTPRequestHandler):
         origin = self.headers.get("Origin")
         self.send_header("Access-Control-Allow-Origin", origin or "*")
         self.send_header("Vary", "Origin")
-        self.send_header("Access-Control-Allow-Headers", "authorization, content-type")
+        self.send_header("Access-Control-Allow-Headers", "authorization, content-type, x-jean-key, x-title, http-referer, anthropic-version")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Expose-Headers", "X-Jean-Model, X-Jean-Port")
 
@@ -252,7 +255,25 @@ class Handler(BaseHTTPRequestHandler):
         self.cors()
         self.end_headers()
 
+    def relay_request(self, method):
+        """Relay CORS: autentica con X-Jean-Key (Authorization es la clave del proveedor)."""
+        got = self.headers.get("X-Jean-Key", "")
+        if not (KEY and hmac.compare_digest(got.encode(), KEY.encode())):
+            return self.reply(401, {"error": {"message": "X-Jean-Key invalida o ausente (usa tu JEAN_API_KEY).", "type": "jean_relay_auth"}})
+        try:
+            url = router.relay_target(self.path, RELAY_HOSTS, RELAY_LOCAL_HTTP)
+            n = int(self.headers.get("Content-Length") or 0)
+            if n > router.MAX_BODY:
+                raise router.RouteError(413, "Peticion demasiado grande.", "invalid_request_error")
+            body = self.rfile.read(n) if method == "POST" else None
+            log(f"relay {method} {url.split('?')[0]}")
+            router.relay(self, method, url, body)
+        except router.RouteError as e:
+            self.reply(e.status, e.body())
+
     def do_GET(self):
+        if self.path.startswith("/relay/"):
+            return self.relay_request("GET")
         try:
             self.get()
         except Exception as e:  # nunca cortar la conexion sin respuesta: el cliente veria "no conecta"
@@ -310,6 +331,8 @@ class Handler(BaseHTTPRequestHandler):
             self.reply(e.status, e.body())
 
     def do_POST(self):
+        if self.path.startswith("/relay/"):
+            return self.relay_request("POST")
         if not self.authed():
             return
         path = self.path.split("?", 1)[0].rstrip("/")

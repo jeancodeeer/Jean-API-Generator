@@ -212,3 +212,83 @@ def forward(handler, port, path, body, key):
         pass                                      # el cliente cancelo (boton detener)
     finally:
         upstream.close()
+
+
+# ---------------------------------------------------------------- relay (CORS) para clientes web
+# Muchas APIs (NVIDIA NIM, SambaNova, DeepSeek, Mistral...) no aceptan llamadas desde una pagina web
+# (CORS). El cliente web de JeanCode puede enviarlas por TU Codespace: /relay/<host>/<ruta>.
+# Solo a hosts de esta lista (no es un proxy abierto), solo https, sin seguir redirecciones, y
+# exige X-Jean-Key (tu JEAN_API_KEY). La clave del proveedor (Authorization) pasa sin tocarse y
+# nunca se registra.
+RELAY_HOSTS = frozenset("""
+api.openai.com api.anthropic.com generativelanguage.googleapis.com openrouter.ai api.groq.com
+router.huggingface.co api.deepseek.com api.mistral.ai api.x.ai api.together.xyz api.fireworks.ai
+api.cerebras.ai integrate.api.nvidia.com api.sambanova.ai api.deepinfra.com api.hyperbolic.xyz
+api.novita.ai api.tokenfactory.nebius.com api.studio.nebius.com llm.chutes.ai api.siliconflow.com
+api.inference.net api.moonshot.ai api.z.ai dashscope-intl.aliyuncs.com api.minimax.io api.cohere.ai
+api.scaleway.ai openai.inference.de-txl.ionos.com
+""".split())
+RELAY_FORWARD_HEADERS = ("authorization", "content-type", "accept", "x-title", "http-referer",
+                         "anthropic-version", "x-api-key")
+_HOST_RE = __import__("re").compile(r"^[a-z0-9.-]+(:\d{1,5})?$")
+
+
+def relay_hosts(extra=""):
+    """Lista permitida + JEAN_RELAY_HOSTS (separados por comas) para APIs propias."""
+    return RELAY_HOSTS | {h.strip().lower() for h in (extra or "").split(",") if h.strip()}
+
+
+def relay_target(path, hosts, local_http=False):
+    """/relay/<host>/<ruta>?q -> https://<host>/<ruta>?q. Lanza RouteError si no esta permitido.
+    local_http solo para pruebas: permite http a 127.0.0.1."""
+    rest = path[len("/relay/"):] if path.startswith("/relay/") else ""
+    host, slash, tail = rest.partition("/")
+    host = host.lower()
+    if not host or not slash or not _HOST_RE.match(host):
+        raise RouteError(400, "Ruta de relay invalida: usa /relay/<host>/<ruta>.", "jean_relay_error")
+    if host not in hosts:
+        raise RouteError(403, f"El relay no reenvia a {host}. Anadelo a JEAN_RELAY_HOSTS si es tuyo.", "jean_relay_forbidden")
+    scheme = "http" if local_http and host.startswith("127.0.0.1:") else "https"
+    if ":" in host and scheme == "https" and not host.endswith(":443"):
+        raise RouteError(403, "El relay solo usa el puerto 443.", "jean_relay_forbidden")
+    return f"{scheme}://{host}/{tail}"
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *a, **k):
+        return None                              # una redireccion podria llevar la clave a otro host
+
+
+_OPENER = urllib.request.build_opener(_NoRedirect)
+
+
+def relay(handler, method, url, body):
+    """Reenvia la peticion del cliente al proveedor y copia la respuesta trozo a trozo."""
+    headers = {k: v for k, v in handler.headers.items() if k.lower() in RELAY_FORWARD_HEADERS}
+    headers.setdefault("User-Agent", "Jean-API-Generator relay")
+    req = urllib.request.Request(url, data=body if method == "POST" else None, method=method, headers=headers)
+    try:
+        upstream = _OPENER.open(req, timeout=READ_TIMEOUT)
+    except urllib.error.HTTPError as e:
+        upstream = e                             # 401/429/... del proveedor: se pasan tal cual
+    except Exception as e:
+        raise RouteError(502, f"No se pudo contactar con el proveedor ({type(e).__name__}).", "jean_relay_error")
+    status = getattr(upstream, "status", None) or upstream.code
+    handler.send_response(status)
+    handler.cors()
+    handler.send_header("Content-Type", upstream.headers.get("Content-Type", "application/json"))
+    handler.send_header("Cache-Control", "no-cache")
+    handler.send_header("Connection", "close")
+    handler.close_connection = True
+    handler.end_headers()
+    try:
+        while True:
+            chunk = upstream.read1(65536) if hasattr(upstream, "read1") else upstream.read(65536)
+            if not chunk:
+                break
+            handler.wfile.write(chunk)
+            handler.wfile.flush()
+    except (BrokenPipeError, ConnectionResetError):
+        pass
+    finally:
+        upstream.close()

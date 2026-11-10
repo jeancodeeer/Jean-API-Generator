@@ -170,6 +170,7 @@ Port **:8899** is also an OpenAI-compatible router: point any client at `https:/
 | `GET` | `/v1/models` | models ready on every port, plus `jean.unavailable`: which port is down and why (loading, off, "Fénix does not fit in this RAM") |
 | `POST` | `/v1/chat/completions` · `/v1/completions` · `/v1/embeddings` | sent to the port that serves `model`, streamed through untouched |
 | `GET` | `/health` | public, no data: `{"ok": true, "ready": 2}` |
+| `GET` `POST` | `/relay/<host>/<path>` | **CORS relay** for web and mobile clients: forwards to APIs that block browsers (NVIDIA NIM, SambaNova, DeepSeek, Mistral…). Only to a fixed list of known provider hosts (plus your own via `JEAN_RELAY_HOSTS`), https only, no redirects. Needs `X-Jean-Key: $JEAN_API_KEY`; the provider key in `Authorization` passes through untouched and is never logged. |
 
 - `"model": "auto"` picks the first ready model (grey > marvel > fenix > others); a unique partial name also works (`"fenix"`).
 - It never switches models silently: an unavailable model gets a `503` with the list of models that are ready, in OpenAI error format, and the client decides.

@@ -112,15 +112,80 @@ def fake_llama(alias, loading=False):
     return port, srv
 
 
+class Relay(unittest.TestCase):
+    H = router.relay_hosts("127.0.0.1:9,api.mia.dev")
+
+    def test_known_host(self):
+        self.assertEqual(router.relay_target("/relay/integrate.api.nvidia.com/v1/models", self.H),
+                         "https://integrate.api.nvidia.com/v1/models")
+
+    def test_extra_host_and_query(self):
+        self.assertEqual(router.relay_target("/relay/api.mia.dev/v1/x?a=1", self.H), "https://api.mia.dev/v1/x?a=1")
+
+    def test_not_an_open_proxy(self):
+        for bad in ("/relay/evil.com/v1/models", "/relay/169.254.169.254/latest", "/relay/127.0.0.1:8888/v1/models",
+                    "/relay/api.openai.com.evil.com/v1", "/relay/user@api.openai.com/v1"):
+            with self.assertRaises(router.RouteError) as c:
+                router.relay_target(bad, self.H)
+            self.assertIn(c.exception.status, (400, 403), bad)
+
+    def test_https_only_and_port_443(self):
+        with self.assertRaises(router.RouteError):
+            router.relay_target("/relay/127.0.0.1:9/v1", self.H)          # http local solo en modo prueba
+        self.assertEqual(router.relay_target("/relay/127.0.0.1:9/v1", self.H, local_http=True), "http://127.0.0.1:9/v1")
+
+    def test_invalid_path(self):
+        for bad in ("/relay/", "/relay/api.openai.com", "/relay//v1"):
+            with self.assertRaises(router.RouteError):
+                router.relay_target(bad, self.H)
+
+
+def fake_provider():
+    """Proveedor externo falso: devuelve la clave que recibio y transmite SSE; /redirect intenta llevarte a otro host."""
+    class H(BaseHTTPRequestHandler):
+        def log_message(self, *a):
+            pass
+
+        def do_GET(self):
+            if self.path.startswith("/redirect"):
+                self.send_response(302)
+                self.send_header("Location", "http://127.0.0.1:1/steal")
+                self.end_headers()
+                return
+            body = json.dumps({"data": [{"id": "prov-model"}], "auth": self.headers.get("Authorization"),
+                               "leaked_jean_key": self.headers.get("X-Jean-Key")}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_POST(self):
+            self.rfile.read(int(self.headers.get("Content-Length") or 0))
+            self.send_response(200)
+            self.send_header("Content-Type", "text/event-stream")
+            self.end_headers()
+            for t in ("ho", "la"):
+                self.wfile.write((f'data: {{"choices":[{{"delta":{{"content":"{t}"}}}}]}}' + "\n\n").encode())
+                self.wfile.flush()
+            self.wfile.write(b"data: [DONE]" + bytes([10, 10]))
+    port = free_port()
+    srv = ThreadingHTTPServer(("127.0.0.1", port), H)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    return port, srv
+
+
 class EndToEnd(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        cls.prov, cls.s3 = fake_provider()
         cls.grey, cls.s1 = fake_llama("jean-grey")
         cls.marvel, cls.s2 = fake_llama("jean-marvel", loading=True)
         cls.dead = free_port()
         cls.port = free_port()
         env = dict(os.environ, JEAN_API_KEY=KEY, JEAN_CONTROL_PORT=str(cls.port),
-                   JEAN_SLOTS=f"{cls.grey}:grey,{cls.marvel}:marvel,{cls.dead}:fenix")
+                   JEAN_SLOTS=f"{cls.grey}:grey,{cls.marvel}:marvel,{cls.dead}:fenix",
+                   JEAN_RELAY_HOSTS=f"127.0.0.1:{cls.prov}", JEAN_RELAY_TEST_LOCAL_HTTP="1")
         cls.proc = subprocess.Popen([sys.executable, os.path.join(ROOT, "control", "control_server.py")],
                                     env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         for _ in range(80):
@@ -136,6 +201,52 @@ class EndToEnd(unittest.TestCase):
         cls.proc.wait(5)
         cls.s1.shutdown()
         cls.s2.shutdown()
+        cls.s3.shutdown()
+
+    def relay(self, path, body=None, jean_key=KEY):
+        h = {"Authorization": "Bearer PROVIDER-KEY", "Content-Type": "application/json", "Origin": "https://jeancodeeer.github.io"}
+        if jean_key:
+            h["X-Jean-Key"] = jean_key
+        req = urllib.request.Request(f"http://127.0.0.1:{self.port}/relay/127.0.0.1:{self.prov}{path}", headers=h,
+                                     method="POST" if body is not None else "GET",
+                                     data=json.dumps(body).encode() if body is not None else None)
+        try:
+            with urllib.request.urlopen(req, timeout=10) as r:
+                return r.status, dict(r.headers), r.read().decode()
+        except urllib.error.HTTPError as e:
+            return e.code, dict(e.headers), e.read().decode()
+
+    def test_relay_needs_jean_key(self):
+        self.assertEqual(self.relay("/v1/models", jean_key=None)[0], 401)
+        self.assertEqual(self.relay("/v1/models", jean_key="wrong")[0], 401)
+
+    def test_relay_passes_provider_key_and_cors(self):
+        code, headers, body = self.relay("/v1/models")
+        self.assertEqual(code, 200)
+        j = json.loads(body)
+        self.assertEqual(j["auth"], "Bearer PROVIDER-KEY")
+        self.assertIsNone(j["leaked_jean_key"], "la clave de Jean no se reenvia al proveedor")
+        self.assertEqual(headers.get("Access-Control-Allow-Origin"), "https://jeancodeeer.github.io")
+
+    def test_relay_streams(self):
+        code, _, body = self.relay("/v1/chat/completions", {"model": "x", "stream": True})
+        self.assertEqual(code, 200)
+        self.assertIn('"ho"', body)
+        self.assertIn("[DONE]", body)
+
+    def test_relay_does_not_follow_redirects(self):
+        self.assertEqual(self.relay("/redirect")[0], 302)
+
+    def test_relay_refuses_other_hosts(self):
+        req = urllib.request.Request(f"http://127.0.0.1:{self.port}/relay/evil.com/v1/models", headers={"X-Jean-Key": KEY})
+        with self.assertRaises(urllib.error.HTTPError) as c:
+            urllib.request.urlopen(req, timeout=5)
+        self.assertEqual(c.exception.code, 403)
+
+    def test_preflight_allows_relay_headers(self):
+        req = urllib.request.Request(f"http://127.0.0.1:{self.port}/relay/api.openai.com/v1/models", method="OPTIONS")
+        with urllib.request.urlopen(req, timeout=5) as r:
+            self.assertIn("x-jean-key", r.headers.get("Access-Control-Allow-Headers"))
 
     def call(self, path, body=None, key=KEY):
         req = urllib.request.Request(f"http://127.0.0.1:{self.port}{path}", method="POST" if body is not None else "GET",
