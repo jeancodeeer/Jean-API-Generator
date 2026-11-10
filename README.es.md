@@ -1,6 +1,12 @@
 <div align="center">
 
-<img src="assets/social-preview.svg" alt="JEANCODE-API — API gratuita compatible con OpenAI para los modelos GGUF Jean, servida con llama.cpp en GitHub Codespaces" width="100%">
+<img src="assets/social-preview.svg" alt="Jean-API-Generator — tu propia API de LLM gratis y compatible con OpenAI en GitHub Codespaces, servida con llama.cpp" width="100%">
+
+<br>
+
+# Tu propia API de LLM gratis y compatible con OpenAI — en un Codespace de GitHub
+
+**Sin GPU, sin tarjeta, sin factura de API.** Un Codespace ejecuta [llama.cpp](https://github.com/ggml-org/llama.cpp) `llama-server` con los modelos Jean (o cualquier GGUF de Hugging Face) y te da **una sola URL** que funciona en cualquier cliente compatible con OpenAI: [JeanCode](https://github.com/jeancodeeer/JeanCode), los SDK de OpenAI, `curl` y los agentes o editores que permiten poner una URL base propia.
 
 <br>
 
@@ -29,6 +35,18 @@ llama.cpp `llama-server` · GitHub Codespaces · solo CPU · contexto 128k
 `Jean-API-Generator` es la capa de despliegue de los modelos **Jean v0.7** (**Grey**, **Marvel** y **Fénix**, ajustados a partir de Qwen3.5-27B y publicados en GGUF en Hugging Face). Convierte un Codespace de GitHub en un servidor de inferencia de LLM autoalojado que habla la **API de OpenAI** (`/v1/chat/completions`, `/v1/models`): cualquier cliente, editor o agente de código compatible solo necesita cambiar la URL base y la clave.
 
 Nada se ejecuta en tu equipo: tu PC solo es un cliente HTTP.
+
+**Por qué usarlo**
+
+- **Gratis y tuyo.** Tu clave, tu Codespace, tus registros. Nadie se pone entre tú y el modelo.
+- **Una URL para todo.** El router en `:8899` expone todos los modelos del Codespace, con el contexto real de cada uno.
+- **Cualquier GGUF, no solo Jean.** Carga un modelo del Hub de Hugging Face en un puerto sin abrir el Codespace (servidor de control).
+- **Honesto con sus límites.** Dice *por qué* un modelo no está disponible (cargando, apagado, no cabe en la RAM) en vez de fallar en silencio. Solo CPU: velocidad de modelo pequeño, no de GPU.
+
+```bash
+# la versión de 30 segundos, con tu Codespace ya encendido
+curl -s https://<codespace>-8899.app.github.dev/v1/models -H "Authorization: Bearer $JEAN_API_KEY"
+```
 
 <br>
 

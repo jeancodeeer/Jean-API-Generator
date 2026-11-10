@@ -1,6 +1,12 @@
 <div align="center">
 
-<img src="assets/social-preview.svg" alt="JEANCODE-API — free OpenAI-compatible API for the Jean GGUF models, served with llama.cpp on GitHub Codespaces" width="100%">
+<img src="assets/social-preview.svg" alt="Jean-API-Generator — your own free OpenAI-compatible LLM API on GitHub Codespaces, served with llama.cpp" width="100%">
+
+<br>
+
+# Your own free OpenAI-compatible LLM API — on a GitHub Codespace
+
+**No GPU, no credit card, no API bill.** One Codespace runs [llama.cpp](https://github.com/ggml-org/llama.cpp) `llama-server` with the Jean models (or any GGUF from Hugging Face) and gives you **one URL** that works in every OpenAI-compatible client: [JeanCode](https://github.com/jeancodeeer/JeanCode), the OpenAI SDKs, `curl`, and coding agents or editors that let you set a custom base URL.
 
 <br>
 
@@ -29,6 +35,18 @@ llama.cpp `llama-server` · GitHub Codespaces · CPU only · 128k context
 `Jean-API-Generator` is the deployment layer for the **Jean v0.7** models (**Grey**, **Marvel** and **Fénix**, fine-tuned from Qwen3.5-27B and published as GGUF on Hugging Face). It turns a GitHub Codespace into a self-hosted LLM inference server that speaks the **OpenAI API** (`/v1/chat/completions`, `/v1/models`), so any OpenAI-compatible client, editor or coding agent can use the models by changing only the base URL and the API key.
 
 Nothing runs on your own computer: your machine is just an HTTP client.
+
+**Why people use it**
+
+- **Free and yours.** Your key, your Codespace, your logs. Nobody else sits between you and the model.
+- **One URL for everything.** The router on `:8899` exposes every model the Codespace serves, with the real context of each one.
+- **Any GGUF, not just Jean.** Load a model from the Hugging Face Hub onto a port without opening the Codespace (control server, below).
+- **Honest about limits.** It tells you *why* a model is unavailable (loading, off, does not fit in RAM) instead of failing silently. CPU only: small-model speeds, not GPU speeds.
+
+```bash
+# the 30-second version, once your Codespace is up
+curl -s https://<codespace>-8899.app.github.dev/v1/models -H "Authorization: Bearer $JEAN_API_KEY"
+```
 
 <br>
 
