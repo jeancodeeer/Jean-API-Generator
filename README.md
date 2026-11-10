@@ -233,7 +233,7 @@ Derived from the current state of the repository (see [docs/HISTORY.md](docs/HIS
 
 - **Security:** secrets are passed only through environment variables or Codespaces secrets; never commit keys or Codespace URLs. See [SECURITY.md](SECURITY.md).
 - **Contributing:** issues and pull requests are welcome – see [CONTRIBUTING.md](CONTRIBUTING.md). The server flags live only in `serve.sh`; please don't duplicate them.
-- **License:** no license file has been published yet, so by default all rights are reserved. The Jean weights derive from [Qwen3.5-27B](https://huggingface.co/unsloth/Qwen3.5-27B-GGUF); check the upstream licence before redistributing them.
+- **License:** [GNU AGPL-3.0](LICENSE) for the code in this repository. If you run a modified version as a network service, you must publish its source. The Jean weights derive from [Qwen3.5-27B](https://huggingface.co/unsloth/Qwen3.5-27B-GGUF); check the upstream licence before redistributing them.
 
 <br>
 
