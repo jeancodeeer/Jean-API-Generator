@@ -228,7 +228,14 @@ python3 tests/bench_humaneval.py --model jean-grey --n 40     # first 40 problem
 python3 tests/bench_humaneval.py --model jean-marvel          # all 164
 ```
 
-Results are published in [`bench/`](bench/) as they are measured, with the exact subset, date and time taken. The same script works against Groq, OpenRouter or a local Ollama, so you can compare like for like.
+**Measured on 2026-11-14** (free Codespace, 4 CPU, first 40 of 164 problems, temperature 0, reasoning off):
+
+| Model | Passed | pass@1 | Time |
+|---|---|---|---|
+| Jean Marvel | 36 / 40 | **0.90** | 17.9 min |
+| Jean Grey | 34 / 40 | **0.85** | 16.0 min |
+
+A subset is not the full benchmark: treat these as a smoke test until the 164-problem run is published. Every answer, pass or fail, is in [`bench/`](bench/). The same script works against Groq, OpenRouter or a local Ollama, so you can compare like for like.
 
 ## 07 — LIMITS
 

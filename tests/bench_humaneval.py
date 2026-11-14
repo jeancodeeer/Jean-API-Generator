@@ -8,7 +8,7 @@ del Codespace o de un contenedor, no en tu PC personal.
   python3 tests/bench_humaneval.py --base-url http://localhost:8899/v1 --model jean-grey --n 40
   (la clave sale de JEAN_API_KEY; el resultado se guarda en bench/humaneval-<modelo>.json)
 """
-import argparse, gzip, json, os, re, subprocess, sys, tempfile, time, urllib.request
+import argparse, gzip, json, os, re, subprocess, sys, tempfile, time, urllib.error, urllib.request
 
 DATA_URL = "https://github.com/openai/human-eval/raw/master/data/HumanEval.jsonl.gz"
 SYSTEM = "You are a Python expert. Complete the function. Reply with ONE ```python code block containing the full function (signature included) and any imports it needs. No explanations."
@@ -27,9 +27,16 @@ def ask(base, key, model, prompt, max_tokens, timeout):
                        "chat_template_kwargs": {"enable_thinking": False}}).encode()
     req = urllib.request.Request(f"{base}/chat/completions", data=body, method="POST",
                                  headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        j = json.loads(r.read())
-    return j["choices"][0]["message"]["content"] or "", j.get("usage", {})
+    # 503 = el modelo está cargando o se reinició: se espera y se reintenta (no cuenta como fallo del modelo)
+    for attempt in range(10):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                j = json.loads(r.read())
+            return j["choices"][0]["message"]["content"] or "", j.get("usage", {})
+        except urllib.error.HTTPError as e:
+            if e.code != 503 or attempt == 9:
+                raise
+            time.sleep(20)
 
 
 def extract(answer, prompt):

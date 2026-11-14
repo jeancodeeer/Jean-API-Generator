@@ -132,7 +132,14 @@ python3 tests/bench_humaneval.py --model jean-grey --n 40     # los 40 primeros 
 python3 tests/bench_humaneval.py --model jean-marvel          # los 164
 ```
 
-Los resultados se publican en [`bench/`](bench/) a medida que se miden, con el subconjunto, la fecha y el tiempo. El mismo script sirve contra Groq, OpenRouter u Ollama local, para comparar en igualdad de condiciones.
+**Medido el 2026-11-14** (Codespace gratuito, 4 CPU, los 40 primeros de 164 problemas, temperatura 0, sin razonamiento):
+
+| Modelo | Aprobados | pass@1 | Tiempo |
+|---|---|---|---|
+| Jean Marvel | 36 / 40 | **0,90** | 17,9 min |
+| Jean Grey | 34 / 40 | **0,85** | 16,0 min |
+
+Un subconjunto no es el benchmark completo: tómalo como prueba rápida hasta publicar la corrida de los 164. Cada respuesta, aprobada o no, está en [`bench/`](bench/). El mismo script sirve contra Groq, OpenRouter u Ollama local, para comparar en igualdad de condiciones.
 
 ## 05 — ESTRUCTURA, LÍMITES Y MÁS
 

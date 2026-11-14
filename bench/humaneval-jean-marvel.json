@@ -1,0 +1,255 @@
+{
+ "benchmark": "HumanEval (openai/human-eval)",
+ "model": "jean-marvel",
+ "problems": 40,
+ "subset": "los 40 primeros",
+ "passed": 36,
+ "pass@1": 0.9,
+ "temperature": 0,
+ "thinking": false,
+ "minutes": 17.9,
+ "completion_tokens": 5474,
+ "date": "2026-11-14",
+ "results": [
+  {
+   "task": "HumanEval/0",
+   "passed": true,
+   "seconds": 57.8,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/1",
+   "passed": true,
+   "seconds": 35.8,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/2",
+   "passed": true,
+   "seconds": 18.4,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/3",
+   "passed": true,
+   "seconds": 15.7,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/4",
+   "passed": true,
+   "seconds": 31.0,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/5",
+   "passed": true,
+   "seconds": 23.4,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/6",
+   "passed": true,
+   "seconds": 34.6,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/7",
+   "passed": true,
+   "seconds": 20.4,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/8",
+   "passed": true,
+   "seconds": 29.3,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/9",
+   "passed": true,
+   "seconds": 26.7,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/10",
+   "passed": false,
+   "seconds": 40.0,
+   "error": "Traceback (most recent call last):\n  File \"/tmp/tmpcg484kft/t.py\", line 48, in <module>\n    check(make_palindrome)\n  File \"/tmp/tmpcg484kft/t.py\", line 43, in check\n    assert candidate('xyz') == 'xyzyx'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  },
+  {
+   "task": "HumanEval/11",
+   "passed": true,
+   "seconds": 19.8,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/12",
+   "passed": true,
+   "seconds": 22.9,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/13",
+   "passed": true,
+   "seconds": 17.8,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/14",
+   "passed": true,
+   "seconds": 15.7,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/15",
+   "passed": true,
+   "seconds": 16.6,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/16",
+   "passed": true,
+   "seconds": 16.5,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/17",
+   "passed": true,
+   "seconds": 43.4,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/18",
+   "passed": true,
+   "seconds": 25.6,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/19",
+   "passed": true,
+   "seconds": 35.3,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/20",
+   "passed": true,
+   "seconds": 51.9,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/21",
+   "passed": true,
+   "seconds": 34.3,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/22",
+   "passed": true,
+   "seconds": 20.4,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/23",
+   "passed": true,
+   "seconds": 5.7,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/24",
+   "passed": true,
+   "seconds": 10.2,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/25",
+   "passed": true,
+   "seconds": 33.7,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/26",
+   "passed": false,
+   "seconds": 22.6,
+   "error": "Traceback (most recent call last):\n  File \"/tmp/tmpc1psq40y/t.py\", line 33, in <module>\n    check(remove_duplicates)\n  File \"/tmp/tmpc1psq40y/t.py\", line 30, in check\n    assert candidate([1, 2, 3, 2, 4, 3, 5]) == [1, 4, 5]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  },
+  {
+   "task": "HumanEval/27",
+   "passed": true,
+   "seconds": 8.4,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/28",
+   "passed": true,
+   "seconds": 19.1,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/29",
+   "passed": true,
+   "seconds": 18.9,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/30",
+   "passed": true,
+   "seconds": 26.0,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/31",
+   "passed": true,
+   "seconds": 32.0,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/32",
+   "passed": false,
+   "seconds": 55.6,
+   "error": "Traceback (most recent call last):\n  File \"/tmp/tmpf5mjqx9x/t.py\", line 48, in <module>\n    check(find_zero)\n  File \"/tmp/tmpf5mjqx9x/t.py\", line 44, in check\n    assert math.fabs(poly(coeffs, solution)) < 1e-4\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  },
+  {
+   "task": "HumanEval/33",
+   "passed": false,
+   "seconds": 34.7,
+   "error": " \"/tmp/tmpjb67s0bj/t.py\", line 29, in <module>\n    check(sort_third)\n  File \"/tmp/tmpjb67s0bj/t.py\", line 22, in check\n    assert tuple(candidate([5, 6, 3, 4, 8, 9, 2])) == tuple([2, 6, 3, 4, 8, 9, 5])\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  },
+  {
+   "task": "HumanEval/34",
+   "passed": true,
+   "seconds": 9.0,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/35",
+   "passed": true,
+   "seconds": 18.1,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/36",
+   "passed": true,
+   "seconds": 20.3,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/37",
+   "passed": true,
+   "seconds": 31.9,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/38",
+   "passed": true,
+   "seconds": 47.9,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/39",
+   "passed": true,
+   "seconds": 27.8,
+   "error": ""
+  }
+ ]
+}
