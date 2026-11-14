@@ -43,6 +43,11 @@ Nada se ejecuta en tu equipo: tu PC solo es un cliente HTTP.
 - **Cualquier GGUF, no solo Jean.** Carga un modelo del Hub de Hugging Face en un puerto sin abrir el Codespace (servidor de control).
 - **Honesto con sus límites.** Dice *por qué* un modelo no está disponible (cargando, apagado, no cabe en la RAM) en vez de fallar en silencio. Solo CPU: velocidad de modelo pequeño, no de GPU.
 
+> [!IMPORTANT]
+> **Uso personal, tu propio Codespace.** Este repositorio es una receta que ejecutas en **tu** cuenta de GitHub, para **ti**. No es un servicio alojado ni debe ofrecerse como tal: los términos de GitHub para Codespaces restringen ofrecerlos como servicio independiente o comercial y pueden suspender las cuentas que los usen mal. No compartas tu URL ni tu clave. Medido en la máquina gratuita de 4 núcleos y 16 GB: unos **8 tokens/s** con Jean Grey, contexto de **131k** (Marvel: 32k), y el Codespace **se duerme tras 30 minutos sin uso**. Para trabajo rápido o pesado, conecta tu cliente a otra API.
+
+**Mejor en pareja.** Combínalo con **[JeanCode](https://github.com/jeancodeeer/JeanCode)**, un agente de programación y cliente de chat sin backend propio (escritorio, web, Android, iOS): pega la URL de este router y tienes un asistente privado sin nadie en el medio.
+
 ```bash
 # la versión de 30 segundos, con tu Codespace ya encendido
 curl -s https://<codespace>-8899.app.github.dev/v1/models -H "Authorization: Bearer $JEAN_API_KEY"
