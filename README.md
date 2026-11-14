@@ -218,6 +218,18 @@ Jean-API-Generator/
 
 <br>
 
+## 06b — BENCHMARK (REPRODUCIBLE)
+
+No quality claims without numbers you can rerun. `tests/bench_humaneval.py` runs OpenAI's public [HumanEval](https://github.com/openai/human-eval) against **any** OpenAI-compatible endpoint, at temperature 0, with reasoning off, and writes every result to `bench/humaneval-<model>.json`:
+
+```bash
+# inside your Codespace (it executes the code the model writes: keep it there, not on your PC)
+python3 tests/bench_humaneval.py --model jean-grey --n 40     # first 40 problems
+python3 tests/bench_humaneval.py --model jean-marvel          # all 164
+```
+
+Results are published in [`bench/`](bench/) as they are measured, with the exact subset, date and time taken. The same script works against Groq, OpenRouter or a local Ollama, so you can compare like for like.
+
 ## 07 — LIMITS
 
 - A Codespace sleeps when idle; the forwarded URLs stop answering until it is woken again.
