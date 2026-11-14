@@ -142,7 +142,7 @@ La estructura del proyecto, los límites conocidos (el Codespace se duerme, solo
 
 ## 06 — SEGURIDAD · CONTRIBUIR · LICENCIA
 
-Ver [SECURITY.md](SECURITY.md) y [CONTRIBUTING.md](CONTRIBUTING.md). El código de este repositorio se publica bajo [GNU AGPL-3.0](LICENSE): si ofreces una versión modificada como servicio en red, debes publicar su código. Los pesos derivan de [Qwen3.5-27B](https://huggingface.co/unsloth/Qwen3.5-27B-GGUF), revisa su licencia antes de redistribuirlos.
+Ver [SECURITY.md](SECURITY.md) y [CONTRIBUTING.md](CONTRIBUTING.md). El código de este repositorio se publica bajo licencia [MIT](LICENSE). Los pesos derivan de [Qwen3.5-27B](https://huggingface.co/unsloth/Qwen3.5-27B-GGUF), revisa su licencia antes de redistribuirlos.
 
 <div align="center">
 
