@@ -122,6 +122,18 @@ curl -s "https://<tu-url-8888>/v1/chat/completions" \
 
 <br>
 
+## 04b — BENCHMARK REPRODUCIBLE
+
+Nada de afirmaciones de calidad sin números que puedas repetir. `tests/bench_humaneval.py` ejecuta [HumanEval](https://github.com/openai/human-eval), el banco público de OpenAI, contra **cualquier** API compatible con OpenAI, a temperatura 0 y sin razonamiento, y guarda cada resultado en `bench/humaneval-<modelo>.json`:
+
+```bash
+# dentro de tu Codespace (ejecuta el código que escribe el modelo: mejor ahí que en tu PC)
+python3 tests/bench_humaneval.py --model jean-grey --n 40     # los 40 primeros problemas
+python3 tests/bench_humaneval.py --model jean-marvel          # los 164
+```
+
+Los resultados se publican en [`bench/`](bench/) a medida que se miden, con el subconjunto, la fecha y el tiempo. El mismo script sirve contra Groq, OpenRouter u Ollama local, para comparar en igualdad de condiciones.
+
 ## 05 — ESTRUCTURA, LÍMITES Y MÁS
 
 La estructura del proyecto, los límites conocidos (el Codespace se duerme, solo CPU, 3 modelos a 128k no caben) y el roadmap están en el [README en inglés](README.md). La cronología con pruebas y decisiones está en [docs/HISTORY.md](docs/HISTORY.md).

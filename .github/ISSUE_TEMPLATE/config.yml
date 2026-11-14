@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Preguntas (Discussions)
+    url: https://github.com/jeancodeeer/Jean-API-Generator/discussions
+    about: Dudas de uso de tu Codespace o del router.
+  - name: ¿Buscas un cliente gráfico? JeanCode
+    url: https://github.com/jeancodeeer/JeanCode
+    about: Chat, generador de proyectos y agente que se conectan a tu API.
