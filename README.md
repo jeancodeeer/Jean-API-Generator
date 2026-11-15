@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="assets/social-preview.svg" alt="Jean-API-Generator — your own free OpenAI-compatible LLM API on GitHub Codespaces, served with llama.cpp" width="100%">
+<img src="assets/social-preview.svg" alt="Jean-API-Generator — your own free OpenAI-compatible LLM API on Kaggle's free GPUs or your own machine, served with llama.cpp" width="100%">
 
 <br>
 
-# Your own free OpenAI-compatible LLM API — on a GitHub Codespace
+# Your own free OpenAI-compatible LLM API
 
-**No GPU, no credit card, no API bill.** One Codespace runs [llama.cpp](https://github.com/ggml-org/llama.cpp) `llama-server` with the Jean models (or any GGUF from Hugging Face) and gives you **one URL** that works in every OpenAI-compatible client: [JeanCode](https://github.com/jeancodeeer/JeanCode), the OpenAI SDKs, `curl`, and coding agents or editors that let you set a custom base URL.
+**No credit card, no API bill, no server of mine in the middle.** One command (or one Kaggle notebook) runs [llama.cpp](https://github.com/ggml-org/llama.cpp) `llama-server` with the Jean models (or any GGUF from Hugging Face) and gives you **one URL** that works in every OpenAI-compatible client: [JeanCode](https://github.com/jeancodeeer/JeanCode), the OpenAI SDKs, `curl`, and coding agents or editors that let you set a custom base URL.
 
 <br>
 
@@ -14,7 +14,6 @@
 [![ENGINE](https://img.shields.io/badge/ENGINE-LLAMA.CPP-ffffff?style=for-the-badge&labelColor=000000)](https://github.com/ggml-org/llama.cpp)
 ![API](https://img.shields.io/badge/API-OPENAI--COMPATIBLE-ffffff?style=for-the-badge&labelColor=000000)
 [![KAGGLE](https://img.shields.io/badge/RUN_ON-KAGGLE_GPU-000000?style=for-the-badge&labelColor=ffffff&logo=kaggle&logoColor=000000)](kaggle/jean-api.ipynb)
-[![CODESPACES](https://img.shields.io/badge/OPEN_IN-CODESPACES-000000?style=for-the-badge&labelColor=ffffff&logo=github&logoColor=000000)](https://codespaces.new/jeancodeeer/Jean-API-Generator)
 
 **`ENGLISH`** · [`ESPAÑOL`](README.es.md)
 
@@ -23,7 +22,7 @@
 ```
 N° 001 — JEANCODE-API                                                REF. V0.7
 Serve the Jean GGUF models as a free, OpenAI-compatible API.
-llama.cpp `llama-server` · Kaggle (free GPU) or GitHub Codespaces (CPU)
+llama.cpp `llama-server` · Kaggle (free GPU) · your PC · any Linux VM
 ```
 
 > [!TIP]
@@ -33,25 +32,25 @@ llama.cpp `llama-server` · Kaggle (free GPU) or GitHub Codespaces (CPU)
 
 ## 01 — WHAT IS THIS
 
-`Jean-API-Generator` is the deployment layer for the **Jean v0.7** models (**Grey**, **Marvel** and **Fénix**, fine-tuned from Qwen3.5-27B and published as GGUF on Hugging Face). It turns a GitHub Codespace into a self-hosted LLM inference server that speaks the **OpenAI API** (`/v1/chat/completions`, `/v1/models`), so any OpenAI-compatible client, editor or coding agent can use the models by changing only the base URL and the API key.
+`Jean-API-Generator` is the deployment layer for the **Jean v0.7** models (**Grey**, **Marvel** and **Fénix**, fine-tuned from Qwen3.5-27B and published as GGUF on Hugging Face). It turns a machine you control into a self-hosted LLM inference server that speaks the **OpenAI API** (`/v1/chat/completions`, `/v1/models`), so any OpenAI-compatible client, editor or coding agent can use the models by changing only the base URL and the API key.
 
-Nothing runs on your own computer: your machine is just an HTTP client.
+**Where it runs:** on **Kaggle**'s free GPUs (recommended: no card, renewed every week), on **your own PC** (Linux, WSL, Windows or macOS) or on **any Linux VM**. Each person runs it with their own account and their own key: there is no shared server.
 
 **Why people use it**
 
-- **Free and yours.** Your key, your Codespace, your logs. Nobody else sits between you and the model.
-- **One URL for everything.** The router on `:8899` exposes every model the Codespace serves, with the real context of each one.
-- **Any GGUF, not just Jean.** Load a model from the Hugging Face Hub onto a port without opening the Codespace (control server, below).
-- **Honest about limits.** It tells you *why* a model is unavailable (loading, off, does not fit in RAM) instead of failing silently. CPU only: small-model speeds, not GPU speeds.
+- **Free and yours.** Your key, your machine, your logs. Nobody else sits between you and the model.
+- **One URL for everything.** The router on `:8899` exposes every model you serve, with the real context of each one.
+- **Any GGUF, not just Jean.** Serve any GGUF from the Hugging Face Hub, or load one while it runs (control server, below).
+- **Honest about limits.** It tells you *why* a model is unavailable (loading, off, does not fit in memory) instead of failing silently.
 
 > [!IMPORTANT]
-> **Personal use, your own Codespace.** This repository is a recipe you run in **your** GitHub account, for **you**. It is not a hosted service and it must not be offered as one: GitHub's terms for Codespaces restrict offering Codespaces as a stand-alone or commercial service, and can suspend accounts that misuse them. Do not share your URL or key. Measured on the free 4-core / 16 GB machine: about **8 tokens/s** on Jean Grey, **131k** context (Marvel: 32k), and the Codespace **sleeps after 30 idle minutes**. For fast or heavy work, point your client at any other API instead.
+> **Personal use.** This repository is a recipe you run in **your** account or on **your** machine, for **you**. It is not a hosted service. Kaggle's terms allow personal, non-commercial use, so don't offer your Kaggle URL to others. Do not share your URL or key.
 
-**Part of a pair.** Pair it with **[JeanCode](https://github.com/jeancodeeer/JeanCode)**, a coding agent and chat client with no backend of its own (desktop, web, Android, iOS): paste this router's URL and you have a private assistant with nobody in the middle.
+**Part of a pair.** Pair it with **[JeanCode](https://github.com/jeancodeeer/JeanCode)**, a coding agent and chat client with no backend of its own (desktop, web, Android, iOS, pygame): paste this router's URL and you have a private assistant with nobody in the middle.
 
 ```bash
-# the 30-second version, once your Codespace is up
-curl -s https://<codespace>-8899.app.github.dev/v1/models -H "Authorization: Bearer $JEAN_API_KEY"
+# the 30-second version, once it prints its URL
+curl -s https://<your-url>/v1/models -H "Authorization: Bearer $JEAN_API_KEY"
 ```
 
 <br>
@@ -62,15 +61,15 @@ What the code in this repository actually does:
 
 | | |
 |---|---|
-| **`llama-server` per model** | `serve.sh {grey\|marvel\|fenix}` downloads the GGUF and starts `llama-server` with Bearer-token authentication (`--api-key`). |
-| **128k context on CPU** | Models start with `-c 131072` and a quantized KV cache (`-ctk q8_0 -ctv q8_0`). Native context of the GGUFs is 262144. |
-| **Two models side by side** | Grey on `:8888` and Marvel on `:8889` fit together in a 16 GB Codespace at 128k context (measurements in [docs/HISTORY.md](docs/HISTORY.md)). |
-| **Auto-start and recovery** | `.devcontainer/autostart.sh` starts the servers at boot, gated by available RAM; `watchdog.sh` checks every 60 s and relaunches a server that stopped answering. |
-| **Persistent mode switch** | `.jean-mode` (`standard` or `fenix`) selects which models run and survives rebuilds; GGUF files live in `gguf/` so restarts don't re-download them. |
-| **Cloudflare quick tunnels** | `cloudflared` is installed on demand as an optional fallback public URL. |
-| **Run it elsewhere** | `generator/` (bash and PowerShell) starts the same stack on Linux / macOS / WSL / Windows with RAM-aware context (≥ 20 GB → 128k, ≥ 12 GB → 64k, otherwise 8k); `oracle/setup-vm.sh` installs it as a **systemd** service. |
-| **Windows control script** | `jean-api.ps1 start\|stop\|urls\|test\|status\|fenix-mode\|standard-mode` wakes, tests and switches the Codespace through the `gh` CLI. |
-| **Helper tools** | `tools/` has a GGUF header reader, a LoRA integrity check, a GGUF splitter and a script that sets Codespaces secrets from environment variables only. |
+| **One launcher** | `launch.py` installs the official llama.cpp build (CUDA when there is an NVIDIA GPU, CPU otherwise; nothing is compiled), serves each model on its own port and GPU, starts the router and opens a public URL. The Kaggle notebook calls the same file. |
+| **`llama-server` per model** | `serve.sh {grey\|marvel\|fenix\|custom}` downloads the GGUF and starts `llama-server` with Bearer-token authentication (`--api-key`). It is the single source of server flags. |
+| **Long context** | Quantized KV cache (`-ctk q8_0 -ctv q8_0`); context per model is set with `JEAN_CTX` (32k by default with the launcher, up to 128k). Native context of the GGUFs is 262144. |
+| **Several models, several GPUs** | Grey and Marvel get one GPU each; Fénix (or a single model) takes all of them. Busy ports are skipped. |
+| **Recovery** | The launcher checks every minute and relaunches a model, the router or the tunnel that stopped, showing the end of its log. |
+| **Public URL** | A Cloudflare quick tunnel to the router (`https://….trycloudflare.com/v1`). `JEAN_TUNNEL=0` keeps it on `http://127.0.0.1:8899/v1` only. |
+| **Native Windows / macOS** | `generator/` (PowerShell and bash) starts a model on your PC with RAM-aware context, listening only on `127.0.0.1`. |
+| **Permanent VM** | `oracle/setup-vm.sh` installs a model as a **systemd** service on an Ubuntu/Debian VM (x86_64 or ARM). |
+| **Helper tools** | `tools/` has a GGUF header reader, a LoRA integrity check and a GGUF splitter. |
 
 <br>
 
@@ -80,12 +79,12 @@ Weights are public on Hugging Face: **[JeanCoder/jean-models](https://huggingfac
 
 | MODEL | SERVED AS | ROLE | GGUF | SIZE |
 |---|---|---|---|---|
-| **JEAN GREY** | `jean-grey` · `:8888` | primary code model | `jean-grey-v0.7.Q4_K_M.gguf` | 2.52 GiB |
-| **JEAN MARVEL** | `jean-marvel` · `:8889` | agent / second opinion | `jean-marvel-v0.7.Q4_K_M.gguf` | 4.36 GiB |
+| **JEAN GREY** | `jean-grey` | primary code model | `jean-grey-v0.7.Q4_K_M.gguf` | 2.52 GiB |
+| **JEAN MARVEL** | `jean-marvel` | agent / second opinion | `jean-marvel-v0.7.Q4_K_M.gguf` | 4.36 GiB |
 | **JEAN FÉNIX** | `jean-fenix` | large model (Qwen3.5-27B + LoRA) | `jean-fenix-v0.7.Q4_K_M.gguf` (+ Q5_K_M, LoRA adapter) | 15.41 GiB |
 
 > [!WARNING]
-> **Fénix needs more RAM than a free Codespace has.** On 16 GB a reduced variant loaded but generated at roughly 100 s per token (measured). Run Fénix on a machine with ≥ 32 GB (see `oracle/` and `generator/`).
+> **Fénix needs about 16 GB of GPU memory or ≥ 32 GB of RAM.** On Kaggle it fits across the two T4 GPUs. On a 16 GB CPU machine a reduced variant loaded but generated at roughly 100 s per token (measured, see [docs/HISTORY.md](docs/HISTORY.md)).
 
 <br>
 
@@ -108,34 +107,43 @@ Kaggle gives every phone-verified account **two NVIDIA T4 GPUs** for free, about
 3. *(Optional)* **Add-ons → Secrets → Add secret**, name `JEAN_API_KEY`, value: a long random key, to keep the same key every session; it never appears in the code or the output. Without it, the notebook creates a key for each session and shows it next to the URL (only you can see your notebook's output).
 4. **Run All.** In 3–6 minutes a box shows the URL (`https://….trycloudflare.com/v1`) and the key. Paste both in JeanCode.
 
-What the notebook does: it clones this repository and runs [`kaggle/launch.py`](kaggle/launch.py), which installs the official llama.cpp CUDA build (nothing is compiled), serves each model with the same `serve.sh` on its own GPU, starts the same router on `:8899` and opens a Cloudflare tunnel to it. If a model or the tunnel stops, it relaunches it.
+**Models:** edit `MODELOS` in the notebook: `grey`, `marvel`, `fenix` (both GPUs), `hf:user/repo/file.gguf` for any GGUF on Hugging Face (add an `HF_TOKEN` secret for private ones), or `file:/kaggle/input/…/model.gguf` for your own GGUF uploaded as a dataset and attached with **Add Input**.
 
-**Models:** edit `MODELOS` in the notebook: `grey`, `marvel`, `fenix` (both GPUs), `hf:user/repo/file.gguf` for any GGUF on Hugging Face (add an `HF_TOKEN` secret for private ones), or `file:/kaggle/input/…/model.gguf` for your own GGUF uploaded as a dataset and attached with **Add Input**. JeanCode's Hugging Face panel can load more models while it runs.
+**Limits:** a Kaggle session lasts up to ~12 hours; after that press **Run All** again, and the URL changes.
 
-**Limits:** a Kaggle session lasts up to ~12 hours; after that press **Run All** again, and the URL changes. Kaggle's terms allow personal, non-commercial use: this is your own API for you, not a service for others.
+### Option B — your own PC or any Linux machine
 
-### Option B — GitHub Codespaces (CPU)
-
-```
-[1] CREATE      →  Codespace from this repo
-[2] SECRET      →  JEAN_API_KEY
-[3] START       →  autostart.sh launches Grey (+ Marvel with ≥ 14 GB)
-[4] PUBLISH     →  forward ports 8888 / 8889 as public
-```
-
-1. **Create a Codespace** from this repository ([open it here](https://codespaces.new/jeancodeeer/Jean-API-Generator)). The dev container installs `llama.cpp` (prebuilt CPU binary) and prepares the models.
-2. **Add Codespaces secrets** (repository or user level):
-   - `JEAN_API_KEY` – the Bearer key your clients must send (you choose it).
-   - `HF_TOKEN` – optional; the models repo is public, so every model downloads anonymously.
-3. **Start / restart the Codespace.** `postStartCommand` runs `.devcontainer/autostart.sh`, which launches Grey on `:8888` and, with ≥ 14 GB RAM, Marvel on `:8889`.
-4. **Make the ports reachable.** Ports 8888/8889 must be forwarded as *public* (the API key protects them). If `GH_PAT` is set as a secret, the Codespace also records its Cloudflare fallback URLs in `~/logs/urls.txt`.
-
-Run a single model by hand inside the Codespace:
+On Linux x86_64 or **WSL** (Windows), with or without an NVIDIA GPU, plus Colab or a VPS:
 
 ```bash
-export JEAN_API_KEY=choose-a-long-random-key
-PORT=8888 bash serve.sh grey
+git clone https://github.com/jeancodeeer/Jean-API-Generator && cd Jean-API-Generator
+python3 launch.py                                   # Grey + Marvel, public URL, key shown once
 ```
+
+```bash
+export JEAN_API_KEY=choose-a-long-random-key        # a fixed key (otherwise one per run)
+JEAN_MODELS=grey JEAN_TUNNEL=0 python3 launch.py    # only Grey, only on http://127.0.0.1:8899/v1
+JEAN_MODELS=hf:unsloth/Qwen3-4B-GGUF/Qwen3-4B-Q4_K_M.gguf python3 launch.py   # any GGUF
+```
+
+It needs Python 3.8+, `bash` and internet the first time. Without a GPU it runs on the CPU: it works, at small-model speeds (measured on 4 cores: a one-word answer in 8.4 s on Grey). Everything it downloads goes to `~/.cache/jean-api` and `gguf/`. `Ctrl+C` stops it all.
+
+**Native Windows or macOS (no WSL):** the scripts in [`generator/`](generator/README.md) start one model on `127.0.0.1`:
+
+```powershell
+.\generator\jean-api-generator.ps1 -Model grey       # Windows
+```
+```bash
+./generator/jean-api-generator.sh start grey         # macOS / Linux
+```
+
+### Option C — a permanent VM
+
+```bash
+sudo bash oracle/setup-vm.sh --model grey --api-key "…"   # systemd service on Ubuntu/Debian
+```
+
+Written for Oracle Cloud's Always Free ARM VM (24 GB, enough for Fénix); it works on any Ubuntu/Debian VM.
 
 <br>
 
@@ -144,7 +152,7 @@ PORT=8888 bash serve.sh grey
 Any OpenAI-compatible client works. With `curl`:
 
 ```bash
-BASE="https://<your-forwarded-8888-url>/v1"
+BASE="https://<your-url>/v1"          # or http://127.0.0.1:8899/v1 on the same machine
 
 curl -s "$BASE/chat/completions" \
   -H "Authorization: Bearer $JEAN_API_KEY" \
@@ -157,7 +165,7 @@ With the OpenAI Python SDK:
 ```python
 from openai import OpenAI
 
-client = OpenAI(base_url="https://<your-forwarded-8888-url>/v1", api_key="<JEAN_API_KEY>")
+client = OpenAI(base_url="https://<your-url>/v1", api_key="<JEAN_API_KEY>")
 r = client.chat.completions.create(
     model="jean-grey",
     messages=[{"role": "user", "content": "Explain what a mutex is in two sentences."}],
@@ -168,40 +176,20 @@ print(r.choices[0].message.content)
 | RESPONSE | MEANING |
 |---|---|
 | `401` | no or wrong Bearer header |
-| `503` right after waking | the model is still loading (about 2–4 minutes for both) |
-
-### Control script for Windows
-
-```powershell
-$env:GH_TOKEN = "<a PAT able to manage your codespaces>"   # never commit this
-.\jean-api.ps1 start          # wake the Codespace, register ports, print URLs
-.\jean-api.ps1 test           # list models, run one chat per model, check that no-key gives 401
-.\jean-api.ps1 fenix-mode     # switch to Fénix mode (persistent)
-.\jean-api.ps1 standard-mode  # back to Grey + Marvel
-.\jean-api.ps1 stop           # stop the Codespace
-```
-
-It looks for `gh` in `PATH` (override with `GH_CLI`) and reads the key from `jean_api_key.txt` next to the script (override with `JEAN_API_KEY_FILE`).
-
-### Run on your own machine or VM
-
-```bash
-./generator/jean-api-generator.sh start grey            # Linux / macOS / WSL
-sudo bash oracle/setup-vm.sh --model fenix --api-key "…" # systemd service on Ubuntu/Debian
-```
+| `503` right after starting | the model is still downloading or loading (2–5 minutes the first time) |
 
 <br>
 
 ## 05a — ONE URL FOR EVERY MODEL (ROUTER)
 
-Port **:8899** is also an OpenAI-compatible router: point any client at `https://<codespace>-8899.app.github.dev/v1` and it sees every model the Codespace is serving, including the GGUFs you load from Hugging Face.
+Port **:8899** is an OpenAI-compatible router: the URL the launcher prints points at it, and it sees every model you serve, including the GGUFs you load from Hugging Face.
 
 | METHOD | PATH | WHAT IT DOES |
 |---|---|---|
 | `GET` | `/v1/models` | models ready on every port, plus `jean.unavailable`: which port is down and why (loading, off, "Fénix does not fit in this RAM") |
 | `POST` | `/v1/chat/completions` · `/v1/completions` · `/v1/embeddings` | sent to the port that serves `model`, streamed through untouched |
 | `GET` | `/health` | public, no data: `{"ok": true, "ready": 2}` |
-| `GET` `POST` | `/relay/<host>/<path>` | **CORS relay** for web and mobile clients: forwards to APIs that block browsers (NVIDIA NIM, SambaNova, DeepSeek, Mistral…). Only to a fixed list of known provider hosts (plus your own via `JEAN_RELAY_HOSTS`), https only, no redirects. Needs `X-Jean-Key: $JEAN_API_KEY`; the provider key in `Authorization` passes through untouched and is never logged. |
+| `GET` `POST` | `/relay/<host>/<path>` | **CORS relay** for web and mobile clients: forwards to APIs that block browsers (NVIDIA NIM, SambaNova, Z.ai…). Only to a fixed list of known provider hosts (plus your own via `JEAN_RELAY_HOSTS`), https only, no redirects. Needs `X-Jean-Key: $JEAN_API_KEY`; the provider key in `Authorization` passes through untouched and is never logged. |
 
 - `"model": "auto"` picks the first ready model (grey > marvel > fenix > others); a unique partial name also works (`"fenix"`).
 - It never switches models silently: an unavailable model gets a `503` with the list of models that are ready, in OpenAI error format, and the client decides.
@@ -210,9 +198,9 @@ Port **:8899** is also an OpenAI-compatible router: point any client at `https:/
 
 <br>
 
-## 05b — LOAD ANY HUGGING FACE MODEL (CONTROL SERVER)
+## 05b — LOAD ANY HUGGING FACE MODEL WHILE IT RUNS (CONTROL SERVER)
 
-`control/control_server.py` listens on **:8899** (started by `autostart.sh`, protected by your `JEAN_API_KEY`). A client such as **[JeanCode](https://github.com/jeancodeeer/JeanCode)** uses it to put any GGUF from Hugging Face on one of the model ports without opening the Codespace:
+`control/control_server.py` is the same process on **:8899**, protected by your `JEAN_API_KEY`. A client such as **[JeanCode](https://github.com/jeancodeeer/JeanCode)** uses it to put any GGUF from Hugging Face on one of the model ports without touching the machine:
 
 | METHOD | PATH | WHAT IT DOES |
 |---|---|---|
@@ -221,9 +209,7 @@ Port **:8899** is also an OpenAI-compatible router: point any client at `https:/
 | `GET` | `/jobs/<id>` | download progress |
 | `POST` | `/restore` `{slot}` | back to the Jean model of that port |
 
-`slot` is `8888`, `8889` or `8890`. An HF token, when sent, is used only for that download and never written to disk. Make port 8899 public together with the model ports (`jean-api.ps1 start` does it). A model loaded this way shows up in the router right away. After a Codespace restart the Jean models come back.
-
-**Fénix mode** (`jean-api.ps1 fenix-mode`) picks, from the models repo on Hugging Face, the largest Fénix GGUF that fits the machine's RAM. When none fits (the 15.4 GB Q4 on a 16 GB Codespace), the router reports the reason instead of failing silently. `serve.sh` refuses to start without `JEAN_API_KEY`, so a public port is never served without a key.
+`slot` is one of the model ports. An HF token, when sent, is used only for that download and never written to disk. A model loaded this way shows up in the router right away and goes on the GPU when there is one. After a restart the models in `JEAN_MODELS` come back. `serve.sh` refuses to start without `JEAN_API_KEY`, so a port is never served without a key.
 
 <br>
 
@@ -231,14 +217,14 @@ Port **:8899** is also an OpenAI-compatible router: point any client at `https:/
 
 ```
 Jean-API-Generator/
+├── launch.py                # the launcher: llama.cpp + models + router + tunnel + recovery (any Linux)
 ├── serve.sh                 # download GGUF + launch llama-server (single source of server flags)
-├── jean-api.ps1             # Windows control script (gh CLI)
-├── kaggle/                  # Kaggle notebook + launcher (free T4 GPUs)
-├── .devcontainer/           # Codespaces: prep, autostart, watchdog, mode switches
-├── generator/               # RAM-aware launchers for Linux/macOS/WSL (sh) and Windows (ps1)
+├── kaggle/                  # Kaggle notebook (calls launch.py)
+├── control/                 # router and control server on :8899
+├── generator/               # native Windows (ps1) and macOS/Linux (sh) launchers, RAM-aware
 ├── oracle/setup-vm.sh       # systemd install on a VM
-├── tools/                   # GGUF/LoRA utilities, Codespaces secrets helper, project map
-├── tests/                   # context (128k) check, diagnostics, Fénix probes
+├── tools/                   # GGUF/LoRA utilities, project map
+├── tests/                   # router and launcher tests, 128k context check, benchmark
 ├── docs/HISTORY.md          # measurements, failed attempts and design decisions
 └── graphify-out/            # code knowledge graph (generated with graphify)
 ```
@@ -250,39 +236,30 @@ Jean-API-Generator/
 No quality claims without numbers you can rerun. `tests/bench_humaneval.py` runs OpenAI's public [HumanEval](https://github.com/openai/human-eval) against **any** OpenAI-compatible endpoint, at temperature 0, with reasoning off, and writes every result to `bench/humaneval-<model>.json`:
 
 ```bash
-# inside your Codespace (it executes the code the model writes: keep it there, not on your PC)
-python3 tests/bench_humaneval.py --model jean-grey --n 40     # first 40 problems
-python3 tests/bench_humaneval.py --model jean-marvel          # all 164
+# it executes the code the model writes: run it on Kaggle, a VM or a container, not on your own PC
+python3 tests/bench_humaneval.py --base-url http://localhost:8899/v1 --model jean-grey --n 40
+python3 tests/bench_humaneval.py --base-url http://localhost:8899/v1 --model jean-marvel   # all 164
 ```
 
-Results are published in [`bench/`](bench/) as they are measured, with the exact subset, date and time taken. The same script works against Groq, OpenRouter or a local Ollama, so you can compare like for like.
+The same script works against Groq, OpenRouter or a local Ollama, so you can compare like for like.
 
 ## 07 — LIMITS
 
-- A Codespace sleeps when idle; the forwarded URLs stop answering until it is woken again.
-- Free Codespaces are CPU-only with 16 GB RAM: expect small-model speeds, not GPU speeds. Measured: a one-word answer took 8.4 s on Grey and 3.5 s on Marvel.
-- Three models at 128k simultaneously do not fit in 16 GB.
+- Kaggle: sessions of up to ~12 hours and about 30 GPU hours a week; the URL changes on every run.
+- The quick tunnel URL is public: the key protects it. Without a GPU, expect small-model speeds.
+- `launch.py` needs Linux x86_64 (WSL counts); on native Windows or macOS use `generator/`.
 
 <br>
 
-## 08 — ROADMAP
+## 08 — SECURITY · CONTRIBUTING · LICENSE
 
-Derived from the current state of the repository (see [docs/HISTORY.md](docs/HISTORY.md)):
-
-- Serve Fénix on a ≥ 32 GB host (VM or Kaggle CPU kernel) – the only thing the free tier cannot do.
-- Rotate and re-inject Codespaces secrets with `tools/set_secrets.py` after any token exposure.
-
-<br>
-
-## 09 — SECURITY · CONTRIBUTING · LICENSE
-
-- **Security:** secrets are passed only through environment variables or Codespaces secrets; never commit keys or Codespace URLs. See [SECURITY.md](SECURITY.md).
+- **Security:** secrets go only through environment variables or Kaggle Secrets; never commit keys or URLs. See [SECURITY.md](SECURITY.md).
 - **Contributing:** issues and pull requests are welcome – see [CONTRIBUTING.md](CONTRIBUTING.md). The server flags live only in `serve.sh`; please don't duplicate them.
 - **License:** [MIT](LICENSE) for the code in this repository. The Jean weights derive from [Qwen3.5-27B](https://huggingface.co/unsloth/Qwen3.5-27B-GGUF); check the upstream licence before redistributing them.
 
 <br>
 
-## 10 — CREDITS
+## 09 — CREDITS
 
 [llama.cpp](https://github.com/ggml-org/llama.cpp) (`llama-server`) by ggml-org · Qwen3.5-27B GGUF base by Qwen / [Unsloth](https://huggingface.co/unsloth/Qwen3.5-27B-GGUF) · [Cloudflare quick tunnels](https://github.com/cloudflare/cloudflared) · [graphify](https://github.com/Graphify-Labs/graphify) for the code graph in `graphify-out/`.
 

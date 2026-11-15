@@ -1,9 +1,9 @@
-"""Pruebas del lanzador de Kaggle (kaggle/launch.py): qué modelo va a qué puerto y a qué GPU."""
+"""Pruebas del lanzador (launch.py): qué modelo va a qué puerto y a qué GPU."""
 import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "kaggle"))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import launch  # noqa: E402
 
 

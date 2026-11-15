@@ -2,7 +2,7 @@
 """Servidor de control de Jean-API-Generator (puerto 8899).
 
 Permite a un cliente (JeanCode) cargar cualquier GGUF de Hugging Face en uno de los puertos
-de modelo del Codespace, sin entrar al Codespace. Solo biblioteca estandar.
+de modelo de tu servidor, sin entrar a la maquina. Solo biblioteca estandar.
 
   GET  /status                  modelos por puerto, disco, RAM y descargas en curso
   POST /load    {repo, file, slot, hf_token?, ctx?}   descarga y sirve el GGUF en ese puerto
@@ -11,12 +11,12 @@ de modelo del Codespace, sin entrar al Codespace. Solo biblioteca estandar.
   GET|POST /relay/<host>/<ruta>  relay CORS hacia APIs conocidas (X-Jean-Key = JEAN_API_KEY)
   GET  /health                  publico: {"ok": true, "ready": N} (sin datos del sistema)
   GET  /v1/models  POST /v1/chat/completions ...   router OpenAI-compatible (ver router.py):
-                                una sola URL para todos los modelos del Codespace
+                                una sola URL para todos los modelos
 
 Seguridad: toda peticion (salvo OPTIONS) exige "Authorization: Bearer $JEAN_API_KEY".
 El token de HF, si se envia, solo se usa para esa descarga y nunca se guarda en disco.
 Los modelos personalizados viven en gguf/custom/ y en /tmp/jean-slot-<puerto>.env; al reiniciar
-el Codespace vuelven los modelos Jean de siempre.
+la maquina vuelven los modelos Jean de siempre.
 """
 import hmac
 import json
@@ -202,7 +202,7 @@ def load_job(job):
             f.write("".join(f"{k}={v}\n" for k, v in env.items()) + f"REPO={repo}\n")
         launch(slot, env, "custom")
         if not wait_healthy(slot):
-            raise RuntimeError("el modelo no arranco (mira /tmp/serve-custom.log en el Codespace)")
+            raise RuntimeError("el modelo no arranco (mira /tmp/serve-custom.log en el servidor)")
         TABLE.invalidate()
         job.update(state="done", alias=alias)
         log(f"slot {slot}: {repo}/{file} listo como {alias}")

@@ -192,7 +192,7 @@ if ($Model -eq "fenix") {
     if ($ramGb -lt 30) {
         throw ("Fenix (27B) necesita >= 32 GB de RAM; este PC tiene {0} GB. " -f $ramGb +
                "Usa grey o marvel aqui; Fenix corre en una maquina grande " +
-               "(o un Codespace premiumLinux de 32 GB).")
+               "(Kaggle con GPU: kaggle/jean-api.ipynb).")
     }
 }
 

@@ -2,6 +2,9 @@
 
 Registro de decisiones y pruebas que explican por qué `jean-api` está configurado como está (fechas de 2026).
 
+## De Codespaces a Kaggle y `launch.py` (noviembre)
+Hasta noviembre la API vivía en un GitHub Codespace (CPU, 4 núcleos, 16 GB). Se dejó porque la cuota gratis de Codespaces se agota en pocos días de uso continuo y solo se recupera al mes siguiente o pagando. Ahora el lanzador único es `launch.py` (cualquier Linux x86_64 o WSL) y Kaggle da dos GPU T4 gratis unas 30 h a la semana, renovadas cada semana; el notebook `kaggle/jean-api.ipynb` llama al mismo lanzador. Los scripts de Codespaces (`.devcontainer/`, `jean-api.ps1`, `tools/set_secrets.py`, `tests/diag.sh`) se retiraron; siguen en el historial de git. Las mediciones de abajo son de esa etapa en CPU.
+
 ## Modelos y entrenamiento
 - Familia v0.7 sobre Qwen3.5-27B: **Grey** y **Marvel** (pequeños) y **Fénix** (27B + LoRA).
 - Los GGUF se publican en <https://huggingface.co/JeanCoder/jean-models> (Grey, Marvel, Fénix Q4_K_M / Q5_K_M / lite IQ4_XS / lite IQ3_M y el adaptador LoRA).

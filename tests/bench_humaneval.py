@@ -3,7 +3,7 @@
 
 Reproducible: mismos problemas (los N primeros o todos), misma instrucción, temperatura 0.
 EJECUTA el código que escribe el modelo (en un proceso aparte, con límite de tiempo): úsalo dentro
-del Codespace o de un contenedor, no en tu PC personal.
+de Kaggle, de una VM o de un contenedor, no en tu PC personal.
 
   python3 tests/bench_humaneval.py --base-url http://localhost:8899/v1 --model jean-grey --n 40
   (la clave sale de JEAN_API_KEY; el resultado se guarda en bench/humaneval-<modelo>.json)
