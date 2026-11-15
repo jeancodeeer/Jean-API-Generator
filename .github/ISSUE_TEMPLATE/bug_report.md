@@ -4,7 +4,7 @@ about: Something doesn't start, answers 401/503, or behaves unexpectedly
 labels: bug
 ---
 
-**Where does it run?** (Codespace / VM / local, and RAM)
+**Where does it run?** (Kaggle / local PC / VM, GPU or CPU, and RAM)
 
 **Command or step that fails**
 

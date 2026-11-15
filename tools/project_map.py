@@ -9,7 +9,7 @@ import os
 OWNER = "".join(chr(c) for c in (106, 101, 97, 110, 99, 111, 100, 101, 101, 101, 114))  # dueno de github (3 e)
 
 def hub_operacion():
-    """Hub del proyecto en el PC: README.md, AGENTS.md, jean-api.ps1, push_all.ps1, key"""
+    """Hub del proyecto en mi PC: README.md, AGENTS.md, push_all.ps1, key"""
     return r"D:\jean-work"
 
 def espejo_repo():
@@ -64,25 +64,19 @@ def hf_perfil():
     """Perfil org del dueno en HF"""
     return "https://huggingface.co/JeanCoder"
 
-def _codespace_url(port):
-    # Regla 1 del repo: ninguna URL privada en archivos. El nombre del Codespace sale del entorno
-    # (JEAN_CODESPACE, o CODESPACE_NAME dentro del propio Codespace); si no, se indica como obtenerla.
-    name = os.environ.get("JEAN_CODESPACE") or os.environ.get("CODESPACE_NAME")
-    if not name:
-        return f"(define JEAN_CODESPACE o usa: jean-api.ps1 urls) -> https://<codespace>-{port}.app.github.dev/v1"
-    return f"https://{name}-{port}.app.github.dev/v1"
+def _api_url(port):
+    # Regla 1 del repo: ninguna URL privada en archivos. La URL publica cambia en cada ejecucion de
+    # launch.py (tunel de Cloudflare) y sale de JEAN_API_URL; si no, se indica la local.
+    base = os.environ.get("JEAN_API_URL")
+    return base if base else f"(la imprime launch.py o el notebook de Kaggle) o local http://127.0.0.1:{port}/v1"
+
+def lanzador():
+    """LANZADOR UNICO: launch.py (cualquier Linux x86_64/WSL; Kaggle lo llama desde kaggle/jean-api.ipynb)"""
+    return "launch.py"
 
 def api_router():
-    """URL unica (router :8899): todos los modelos del Codespace, OpenAI-compatible, Bearer JEAN_API_KEY"""
-    return _codespace_url(8899)
-
-def api_grey():
-    """API viva de Jean Grey (OpenAI-compatible, contexto 131072, Bearer JEAN_API_KEY)"""
-    return _codespace_url(8888)
-
-def api_marvel():
-    """API viva de Jean Marvel (OpenAI-compatible, contexto 131072)"""
-    return _codespace_url(8889)
+    """URL unica (router :8899): todos los modelos servidos, OpenAI-compatible, Bearer JEAN_API_KEY"""
+    return _api_url(8899)
 
 def graphify_upstream():
     """Proyecto Graphify (genera graphify-out/: GRAPH_REPORT.md + graph.json + graph.html)"""
@@ -90,8 +84,8 @@ def graphify_upstream():
 
 # --- tabla rapida: donde vive cada peso (referencia cruzada) ---
 PESOS = {
-    "jean-grey Q4_K_M (2.52 GiB)": ["HF jean-models (canonico)", "Ollama store local", "workspace Codespace"],
-    "jean-marvel Q4_K_M (4.36 GiB)": ["HF jean-models (canonico)", "Ollama store local", "workspace Codespace"],
+    "jean-grey Q4_K_M (2.52 GiB)": ["HF jean-models (canonico)", "Ollama store local", "gguf/ junto a launch.py"],
+    "jean-marvel Q4_K_M (4.36 GiB)": ["HF jean-models (canonico)", "Ollama store local", "gguf/ junto a launch.py"],
     "jean-fenix Q4_K_M (15.41 GiB)": ["SOLO HF jean-models (sin copia local)"],
     "jean-fenix Q5_K_M (17.91 GiB)": ["SOLO HF jean-models"],
     "jean-fenix lite-IQ3_M (11.72 GiB)": ["SOLO HF jean-models"],

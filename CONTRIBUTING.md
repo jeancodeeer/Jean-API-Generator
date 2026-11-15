@@ -11,7 +11,9 @@ Issues and pull requests are welcome.
 
 ## Checking your change
 ```bash
-bash -n serve.sh .devcontainer/*.sh generator/*.sh oracle/setup-vm.sh   # syntax check
-bash tests/test_ctx.sh      # inside a Codespace: verifies the 128k context
-bash tests/diag.sh          # inside a Codespace: processes, logs, disk
+bash -n serve.sh generator/*.sh oracle/setup-vm.sh   # syntax check
+python tests/test_router.py                          # router
+python -m unittest tests.test_launch                 # launcher: ports and GPUs per model
+bash tests/e2e_launch.sh                             # the real thing on Linux/WSL: small model, no tunnel
+bash tests/test_ctx.sh      # on a machine with >= 16 GB: verifies the 128k context
 ```

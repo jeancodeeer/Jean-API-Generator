@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Jean API en GitHub Codespaces (CPU).
+# Sirve un modelo Jean (o un GGUF propio) con llama-server. Lo llaman launch.py y control_server.py.
 # Uso:  bash serve.sh {grey|marvel|fenix|custom}
 #   custom: GGUF cargado por control/control_server.py; usa CUSTOM_FILE (ruta dentro de gguf/),
 #           CUSTOM_ALIAS y CUSTOM_CTX (default 16384). No descarga nada.
@@ -15,8 +15,8 @@
 #   PORT           puerto (default 8888)
 #   JEAN_CTX       contexto de Grey/Marvel (default 131072)
 #   JEAN_THREADS   hilos de CPU (default: nproc)
-#   JEAN_LLAMA_BIN ruta de un llama-server ya instalado (Kaggle usa el binario CUDA oficial)
-#   JEAN_NGL       capas en la GPU (p. ej. 99 = todas); sin definir = solo CPU, como en Codespaces
+#   JEAN_LLAMA_BIN ruta de un llama-server ya instalado (launch.py instala el oficial, CUDA o CPU)
+#   JEAN_NGL       capas en la GPU (p. ej. 99 = todas); sin definir = solo CPU
 #   JEAN_GPU       GPU(s) para este modelo (CUDA_VISIBLE_DEVICES, p. ej. 0, 1 o 0,1)
 set -euo pipefail
 
@@ -62,8 +62,8 @@ else
 fi
 BASE="$(basename "$FILE" .gguf)"
 
-# Contexto: 128k con KV q8_0 (verificado en vivo: ambos a la vez, 3.7 GB
-# libres en el codespace de 16 GB). Fenix: FENIX_CTX configurable; el lite
+# Contexto: 128k con KV q8_0 (medido: Grey y Marvel a la vez caben en 16 GB
+# de RAM con 3.7 GB libres). Fenix: FENIX_CTX configurable; el lite
 # en 16 GB debe bajarlo (4096-8192).
 CTX="${JEAN_CTX:-131072}"
 [ "$MODEL" = "fenix" ] && CTX="${FENIX_CTX:-131072}"

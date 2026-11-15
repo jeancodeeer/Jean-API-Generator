@@ -1,6 +1,6 @@
 """Router OpenAI-compatible de Jean-API-Generator.
 
-Una sola URL (el puerto de control, 8899) para todos los modelos del Codespace:
+Una sola URL (el puerto de control, 8899) para todos los modelos de tu servidor:
 
   GET  /v1/models                 modelos listos de todos los puertos (+ los que no lo estan, con motivo)
   POST /v1/chat/completions       se envia al puerto que sirve el "model" pedido
@@ -57,8 +57,8 @@ def resolve(requested, ready):
     """
     available = sorted(ready, key=lambda m: (rank(m), m))
     if not available:
-        raise RouteError(503, "Ningun modelo esta listo todavia. Si el Codespace acaba de despertar, "
-                              "espera 2-4 minutos.", "jean_unavailable")
+        raise RouteError(503, "Ningun modelo esta listo todavia. Si acabas de arrancarlo, "
+                              "espera 2-5 minutos a que carguen.", "jean_unavailable")
     want = (requested or "auto").strip()
     if want.lower() == "auto":
         return available[0], ready[available[0]]
@@ -216,7 +216,7 @@ def forward(handler, port, path, body, key):
 
 # ---------------------------------------------------------------- relay (CORS) para clientes web
 # Muchas APIs (NVIDIA NIM, SambaNova, DeepSeek, Mistral...) no aceptan llamadas desde una pagina web
-# (CORS). El cliente web de JeanCode puede enviarlas por TU Codespace: /relay/<host>/<ruta>.
+# (CORS). El cliente web de JeanCode puede enviarlas por TU servidor: /relay/<host>/<ruta>.
 # Solo a hosts de esta lista (no es un proxy abierto), solo https, sin seguir redirecciones, y
 # exige X-Jean-Key (tu JEAN_API_KEY). La clave del proveedor (Authorization) pasa sin tocarse y
 # nunca se registra.
