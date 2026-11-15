@@ -13,10 +13,12 @@ Modelos (JEAN_MODELS, separados por comas):
   hf:usuario/repo/archivo.gguf           cualquier GGUF de Hugging Face (HF_TOKEN si es privado)
   file:/kaggle/input/.../modelo.gguf     un GGUF tuyo, subido como dataset y añadido con "Add Input"
 
-La clave nunca se imprime ni se escribe en un archivo: llega por el entorno desde los Secrets.
+Clave: la del secreto JEAN_API_KEY de Kaggle (fija, nunca se imprime). Sin secreto, se genera una para esta
+sesión y se muestra junto a la URL: solo la ve el dueño del notebook y cambia en cada Run All, como la URL.
 """
 import json
 import os
+import secrets
 import re
 import shutil
 import signal
@@ -237,20 +239,28 @@ def router_models():
         return [], []
 
 
+SESSION_KEY = False  # True si la clave se generó para esta sesión (no hay secreto)
+
+
 def banner(url, ready):
     print("\n" + "=" * 72, flush=True)
     print(f"  URL para JeanCode :  {url}/v1", flush=True)
-    print("  Clave             :  tu JEAN_API_KEY (la de los Secrets de Kaggle)", flush=True)
+    if SESSION_KEY:
+        print(f"  Clave             :  {os.environ['JEAN_API_KEY']}", flush=True)
+        print("                       (solo para esta sesión; para una fija, añade el secreto JEAN_API_KEY)", flush=True)
+    else:
+        print("  Clave             :  tu JEAN_API_KEY (la de los Secrets de Kaggle)", flush=True)
     print(f"  Modelos listos    :  {', '.join(ready) if ready else '(cargando...)'}", flush=True)
     print("=" * 72 + "\n", flush=True)
 
 
 # ------------------------------------------------------------------ main
 def main():
+    global SESSION_KEY
     if not os.environ.get("JEAN_API_KEY"):
-        say("Falta el secreto JEAN_API_KEY: en el notebook, Add-ons → Secrets → Add secret, "
-            "nómbralo JEAN_API_KEY, activa su casilla y vuelve a ejecutar.")
-        return 1
+        os.environ["JEAN_API_KEY"] = "jean-" + secrets.token_urlsafe(24)
+        SESSION_KEY = True
+        say("sin secreto JEAN_API_KEY: uso una clave nueva solo para esta sesión (la verás junto a la URL)")
     gpus = count_gpus()
     say(f"GPU detectadas: {gpus}" + ("" if gpus else " (sin GPU: Settings → Accelerator → GPU T4 x2 para ir mucho más rápido)"))
     plan = plan_slots(parse_models(os.environ.get("JEAN_MODELS")), gpus)

@@ -99,14 +99,14 @@ Kaggle gives every phone-verified account **two NVIDIA T4 GPUs** for free, about
 [1] VERIFY      →  your phone in Kaggle (needed for GPU and internet)
 [2] IMPORT      →  kaggle/jean-api.ipynb into a new Kaggle notebook
 [3] SETTINGS    →  Accelerator: GPU T4 x2 · Internet: On
-[4] SECRET      →  Add-ons → Secrets → JEAN_API_KEY
+[4] SECRET      →  optional: Add-ons → Secrets → JEAN_API_KEY
 [5] RUN ALL     →  copy the URL it prints into JeanCode
 ```
 
 1. In Kaggle: **Create → New Notebook → File → Import Notebook** and pick [`kaggle/jean-api.ipynb`](kaggle/jean-api.ipynb) from this repository.
 2. In the right panel, **Settings**: *Accelerator* `GPU T4 x2`, *Internet* `On`.
-3. **Add-ons → Secrets → Add secret**, name `JEAN_API_KEY`, value: a long random key you choose (JeanCode's **Generate** button makes one). Tick it for the notebook. It never appears in the code or the output.
-4. **Run All.** In 3–6 minutes a box shows `URL para JeanCode: https://….trycloudflare.com/v1`. Paste it in JeanCode with your key.
+3. *(Optional)* **Add-ons → Secrets → Add secret**, name `JEAN_API_KEY`, value: a long random key, to keep the same key every session; it never appears in the code or the output. Without it, the notebook creates a key for each session and shows it next to the URL (only you can see your notebook's output).
+4. **Run All.** In 3–6 minutes a box shows the URL (`https://….trycloudflare.com/v1`) and the key. Paste both in JeanCode.
 
 What the notebook does: it clones this repository and runs [`kaggle/launch.py`](kaggle/launch.py), which installs the official llama.cpp CUDA build (nothing is compiled), serves each model with the same `serve.sh` on its own GPU, starts the same router on `:8899` and opens a Cloudflare tunnel to it. If a model or the tunnel stops, it relaunches it.
 
