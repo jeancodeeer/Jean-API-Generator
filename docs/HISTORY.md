@@ -23,5 +23,5 @@ El Codespace recicla el contenedor y borra `/tmp` y `$HOME`; el *workspace* sobr
 - IQ4_XS (14,15 GiB): no carga estable. IQ3_M (11,72 GiB): carga, pero ~100 s/token porque el servidor relee pesos desde disco.
 - Conclusión: Fénix necesita ≥ 32 GB (VM o kernel CPU de Kaggle).
 
-## Nota sobre el propietario en las URLs
-El propietario correcto en GitHub es `jeancodeeer` (tres «e» entre la «d» y la «r»). Una variante con una «e» de más (`jeancodeeeer`) estuvo en varios scripts y daba 404; ya está corregida. Los scripts nuevos no deben escribirlo a mano: el propietario se puede obtener con `gh api user --jq .login`.
+## Nota sobre mi usuario en las URLs
+Mi usuario de GitHub es `jeancodeeer` (tres «e» entre la «d» y la «r»). Una variante con una «e» de más (`jeancodeeeer`) estuvo en varios scripts y daba 404; ya está corregida. Los scripts nuevos no deben escribirlo a mano: se puede obtener con `gh api user --jq .login`.

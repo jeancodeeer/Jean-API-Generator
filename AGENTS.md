@@ -12,7 +12,7 @@ q8_0**. Base del pipeline QA: Hugging Face `JeanCoder/jean-models` (público).
 ## Reglas duras
 1. **Ninguna clave/URL privada en archivos**: valores solo por env vars/secrets.
    Para secretos del Codespace usa `tools/set_secrets.py` (toda entrada via
-   entorno). Nunca hardcodear el owner de URLs: derivarlo de `GET /user` (una
+   entorno). Nunca escribas mi usuario a mano en las URLs: derívalo de `GET /user` (una
    `e` de menos en `jeancodeeer` produjo un falso diagnóstico de "repo oculto").
 2. **No tocar los parámetros de serve.sh** (`-c 131072`, `-ctk/-ctv q8_0`) sin
    re-verificar RAM: en 16 GB solo 2 modelos caben a la vez (verificado en vivo).
@@ -31,13 +31,13 @@ q8_0**. Base del pipeline QA: Hugging Face `JeanCoder/jean-models` (público).
 ## Dónde está TODO (mapa físico + web)
 Fuente completa y actualizada: `tools/project_map.py` (parseable por Graphify) y README §6.
 
-- **Hub en el PC**: `D:\jean-work` — README/AGENTS/`jean-api.ps1`/`push_all.ps1`/`jean_api_key.txt`,
+- **Hub en mi PC**: `D:\jean-work` — README/AGENTS/`jean-api.ps1`/`push_all.ps1`/`jean_api_key.txt`,
   espejo del repo en `codespaces-jean\`, kernels Kaggle en `kaggle\`, experimentos en `archive\`.
 - **Pesos de los modelos**: fuente canónica = HF público `https://huggingface.co/JeanCoder/jean-models`
   (los 7 GGUF de Jean). Copias locales: store de Ollama `D:\ollama_models` (grey+marvel, 6.9 GB) y
   `gguf/` del workspace del Codespace. Peso base Qwen27B: `D:\jean-work\fenix-gguf\` (NO borrar).
 - **Entrenamiento**: `G:\LIFE IN DANGER\openjarvis-jean-grey` (datasets/LoRA/persona + RUNLOG en `scripts\kaggle\`).
-- **Web**: perfil `https://github.com/jeancodeeer` · repos `jean-api`, `librecodigo`, `kanye-nest` ·
+- **Web**: mi perfil `https://github.com/jeancodeeer` · repos `jean-api`, `librecodigo`, `kanye-nest` ·
   HF `https://huggingface.co/JeanCoder` · APIs vivas (Grey :8888, Marvel :8889, Fénix-lite :8890 en modo fenix).
 
 8. **Router en :8899** (`control/router.py`): URL única OpenAI-compatible para todos los puertos.
