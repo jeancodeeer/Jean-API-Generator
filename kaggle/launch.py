@@ -22,6 +22,7 @@ import secrets
 import re
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import tarfile
@@ -74,9 +75,20 @@ def alias_of(m):
     return re.sub(r"[^a-z0-9._-]+", "-", base)[:64]
 
 
-def plan_slots(models, gpus):
-    """Asigna puerto y GPU a cada modelo. Fénix (o un único modelo) usa todas las GPU."""
-    plan = []
+def port_free(port):
+    """True si nadie escucha en ese puerto (en Kaggle, su propio servidor de Jupyter ocupa el 8888)."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            s.bind(("127.0.0.1", port))
+            return True
+        except OSError:
+            return False
+
+
+def plan_slots(models, gpus, is_free=port_free):
+    """Asigna puerto (libre) y GPU a cada modelo. Fénix (o un único modelo) usa todas las GPU."""
+    plan, port = [], FIRST_PORT
     for i, m in enumerate(models):
         if not gpus:
             gpu = ""
@@ -84,10 +96,14 @@ def plan_slots(models, gpus):
             gpu = ",".join(str(g) for g in range(gpus))
         else:
             gpu = str(i % gpus)
-        plan.append({**m, "port": FIRST_PORT + i, "gpu": gpu, "alias": alias_of(m)})
-    ports = [p["port"] for p in plan]
-    if ROUTER_PORT in ports:
-        raise ValueError("demasiados modelos: como máximo 11")
+        while port == ROUTER_PORT or not is_free(port):
+            port += 1
+            if port > FIRST_PORT + 40:
+                raise ValueError("no encuentro puertos libres para los modelos")
+        plan.append({**m, "port": port, "gpu": gpu, "alias": alias_of(m)})
+        port += 1
+    if len(plan) > 10:
+        raise ValueError("demasiados modelos: como máximo 10")
     return plan
 
 
@@ -267,6 +283,9 @@ def main():
         os.environ["JEAN_API_KEY"] = "jean-" + secrets.token_urlsafe(24)
         SESSION_KEY = True
         say("sin secreto JEAN_API_KEY: uso una clave nueva solo para esta sesión (la verás junto a la URL)")
+    global ROUTER_PORT
+    while not port_free(ROUTER_PORT):  # el router también necesita un puerto libre
+        ROUTER_PORT += 1000 if ROUTER_PORT == 8899 else 1
     gpus = count_gpus()
     say(f"GPU detectadas: {gpus}" + ("" if gpus else " (sin GPU: Settings → Accelerator → GPU T4 x2 para ir mucho más rápido)"))
     plan = plan_slots(parse_models(os.environ.get("JEAN_MODELS")), gpus)
