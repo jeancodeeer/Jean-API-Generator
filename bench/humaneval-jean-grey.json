@@ -1,0 +1,255 @@
+{
+ "benchmark": "HumanEval (openai/human-eval)",
+ "model": "jean-grey",
+ "problems": 40,
+ "subset": "los 40 primeros",
+ "passed": 34,
+ "pass@1": 0.85,
+ "temperature": 0,
+ "thinking": false,
+ "minutes": 16.0,
+ "completion_tokens": 5934,
+ "date": "2026-11-14",
+ "results": [
+  {
+   "task": "HumanEval/0",
+   "passed": true,
+   "seconds": 25.1,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/1",
+   "passed": false,
+   "seconds": 26.8,
+   "error": "Traceback (most recent call last):\n  File \"/tmp/tmpt86vo4jb/t.py\", line 54, in <module>\n    check(separate_paren_groups)\n  File \"/tmp/tmpt86vo4jb/t.py\", line 42, in check\n    assert candidate('(()()) ((())) () ((())()())') == [\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  },
+  {
+   "task": "HumanEval/2",
+   "passed": true,
+   "seconds": 13.3,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/3",
+   "passed": true,
+   "seconds": 20.2,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/4",
+   "passed": true,
+   "seconds": 22.2,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/5",
+   "passed": true,
+   "seconds": 18.5,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/6",
+   "passed": true,
+   "seconds": 25.0,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/7",
+   "passed": true,
+   "seconds": 15.2,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/8",
+   "passed": true,
+   "seconds": 21.2,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/9",
+   "passed": true,
+   "seconds": 21.0,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/10",
+   "passed": false,
+   "seconds": 14.6,
+   "error": "  File \"/tmp/tmpnr1jz7ti/t.py\", line 20\n    <tool_call>\n    ^\nSyntaxError: invalid syntax\n"
+  },
+  {
+   "task": "HumanEval/11",
+   "passed": true,
+   "seconds": 34.9,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/12",
+   "passed": true,
+   "seconds": 42.3,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/13",
+   "passed": true,
+   "seconds": 89.7,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/14",
+   "passed": true,
+   "seconds": 10.7,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/15",
+   "passed": true,
+   "seconds": 12.3,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/16",
+   "passed": true,
+   "seconds": 11.1,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/17",
+   "passed": true,
+   "seconds": 40.4,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/18",
+   "passed": true,
+   "seconds": 19.6,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/19",
+   "passed": true,
+   "seconds": 24.9,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/20",
+   "passed": true,
+   "seconds": 35.9,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/21",
+   "passed": false,
+   "seconds": 26.8,
+   "error": "Traceback (most recent call last):\n  File \"/tmp/tmpi9dd5a76/t.py\", line 36, in <module>\n    check(rescale_to_unit)\n  File \"/tmp/tmpi9dd5a76/t.py\", line 29, in check\n    assert candidate([2.0, 49.9]) == [0.0, 1.0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  },
+  {
+   "task": "HumanEval/22",
+   "passed": true,
+   "seconds": 15.6,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/23",
+   "passed": true,
+   "seconds": 7.6,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/24",
+   "passed": true,
+   "seconds": 12.6,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/25",
+   "passed": true,
+   "seconds": 25.2,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/26",
+   "passed": false,
+   "seconds": 16.5,
+   "error": "Traceback (most recent call last):\n  File \"/tmp/tmp9yluwepk/t.py\", line 33, in <module>\n    check(remove_duplicates)\n  File \"/tmp/tmp9yluwepk/t.py\", line 30, in check\n    assert candidate([1, 2, 3, 2, 4, 3, 5]) == [1, 4, 5]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  },
+  {
+   "task": "HumanEval/27",
+   "passed": true,
+   "seconds": 10.3,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/28",
+   "passed": true,
+   "seconds": 84.8,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/29",
+   "passed": true,
+   "seconds": 14.3,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/30",
+   "passed": true,
+   "seconds": 18.9,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/31",
+   "passed": true,
+   "seconds": 25.4,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/32",
+   "passed": false,
+   "seconds": 15.5,
+   "error": "  File \"/tmp/tmp5ll2_fhe/t.py\", line 24\n    <tool_call>\n    ^\nSyntaxError: invalid syntax\n"
+  },
+  {
+   "task": "HumanEval/33",
+   "passed": true,
+   "seconds": 28.7,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/34",
+   "passed": true,
+   "seconds": 11.8,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/35",
+   "passed": true,
+   "seconds": 13.3,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/36",
+   "passed": true,
+   "seconds": 17.5,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/37",
+   "passed": true,
+   "seconds": 24.0,
+   "error": ""
+  },
+  {
+   "task": "HumanEval/38",
+   "passed": false,
+   "seconds": 18.0,
+   "error": "most recent call last):\n  File \"/tmp/tmpqweq8x0j/t.py\", line 27, in <module>\n    check(decode_cyclic)\n  File \"/tmp/tmpqweq8x0j/t.py\", line 22, in check\n    encoded_str = encode_cyclic(str)\n                  ^^^^^^^^^^^^^\nNameError: name 'encode_cyclic' is not defined. Did you mean: 'decode_cyclic'?\n"
+  },
+  {
+   "task": "HumanEval/39",
+   "passed": true,
+   "seconds": 29.0,
+   "error": ""
+  }
+ ]
+}
