@@ -1,19 +1,19 @@
 <div align="center">
 
-<img src="assets/social-preview.svg" alt="Jean-API-Generator — your own free OpenAI-compatible LLM API on GitHub Codespaces, served with llama.cpp" width="100%">
+<img src="assets/social-preview.svg" alt="Jean-API-Generator — your own free OpenAI-compatible LLM API on Hugging Face Spaces, served with llama.cpp" width="100%">
 
 <br>
 
-# Your own free OpenAI-compatible LLM API — on a GitHub Codespace
+# Your own free OpenAI-compatible LLM API — on a Hugging Face Space
 
-**No GPU, no credit card, no API bill.** One Codespace runs [llama.cpp](https://github.com/ggml-org/llama.cpp) `llama-server` with the Jean models (or any GGUF from Hugging Face) and gives you **one URL** that works in every OpenAI-compatible client: [JeanCode](https://github.com/jeancodeeer/JeanCode), the OpenAI SDKs, `curl`, and coding agents or editors that let you set a custom base URL.
+**No GPU, no credit card, no API bill.** One free Hugging Face Space runs [llama.cpp](https://github.com/ggml-org/llama.cpp) `llama-server` with the Jean models (or any GGUF from Hugging Face) and gives you **one URL** that works in every OpenAI-compatible client: [JeanCode](https://github.com/jeancodeeer/JeanCode), the OpenAI SDKs, `curl`, and coding agents or editors that let you set a custom base URL.
 
 <br>
 
 [![MODELS](https://img.shields.io/badge/MODELS-JEANCODER%2FJEAN--MODELS-ffffff?style=for-the-badge&labelColor=000000)](https://huggingface.co/JeanCoder/jean-models)
 [![ENGINE](https://img.shields.io/badge/ENGINE-LLAMA.CPP-ffffff?style=for-the-badge&labelColor=000000)](https://github.com/ggml-org/llama.cpp)
 ![API](https://img.shields.io/badge/API-OPENAI--COMPATIBLE-ffffff?style=for-the-badge&labelColor=000000)
-[![CODESPACES](https://img.shields.io/badge/OPEN_IN-CODESPACES-000000?style=for-the-badge&labelColor=ffffff&logo=github&logoColor=000000)](https://codespaces.new/jeancodeeer/Jean-API-Generator)
+[![HUGGING FACE](https://img.shields.io/badge/DUPLICATE-HF_SPACE-000000?style=for-the-badge&labelColor=ffffff&logo=huggingface&logoColor=000000)](https://huggingface.co/spaces/JeanCoder/jean-api?duplicate=true)
 
 **`ENGLISH`** · [`ESPAÑOL`](README.es.md)
 
@@ -22,7 +22,7 @@
 ```
 N° 001 — JEANCODE-API                                                REF. V0.7
 Serve the Jean GGUF models as a free, OpenAI-compatible API.
-llama.cpp `llama-server` · GitHub Codespaces · CPU only · 128k context
+llama.cpp `llama-server` · Hugging Face Spaces (free CPU) · or GitHub Codespaces
 ```
 
 > [!TIP]
@@ -32,25 +32,25 @@ llama.cpp `llama-server` · GitHub Codespaces · CPU only · 128k context
 
 ## 01 — WHAT IS THIS
 
-`Jean-API-Generator` is the deployment layer for the **Jean v0.7** models (**Grey**, **Marvel** and **Fénix**, fine-tuned from Qwen3.5-27B and published as GGUF on Hugging Face). It turns a GitHub Codespace into a self-hosted LLM inference server that speaks the **OpenAI API** (`/v1/chat/completions`, `/v1/models`), so any OpenAI-compatible client, editor or coding agent can use the models by changing only the base URL and the API key.
+`Jean-API-Generator` is the deployment layer for the **Jean v0.7** models (**Grey**, **Marvel** and **Fénix**, fine-tuned from Qwen3.5-27B and published as GGUF on Hugging Face). It turns a free Hugging Face Space (or a GitHub Codespace) into a self-hosted LLM inference server that speaks the **OpenAI API** (`/v1/chat/completions`, `/v1/models`), so any OpenAI-compatible client, editor or coding agent can use the models by changing only the base URL and the API key.
 
 Nothing runs on your own computer: your machine is just an HTTP client.
 
 **Why people use it**
 
-- **Free and yours.** Your key, your Codespace, your logs. Nobody else sits between you and the model.
-- **One URL for everything.** The router on `:8899` exposes every model the Codespace serves, with the real context of each one.
+- **Free and yours.** Your key, your Space, your logs. Nobody else sits between you and the model.
+- **One URL for everything.** The router (`https://<you>-<space>.hf.space/v1`, or `:8899` on a Codespace) exposes every model it serves, with the real context of each one.
 - **Any GGUF, not just Jean.** Load a model from the Hugging Face Hub onto a port without opening the Codespace (control server, below).
 - **Honest about limits.** It tells you *why* a model is unavailable (loading, off, does not fit in RAM) instead of failing silently. CPU only: small-model speeds, not GPU speeds.
 
 > [!IMPORTANT]
-> **Personal use, your own Codespace.** This repository is a recipe you run in **your** GitHub account, for **you**. It is not a hosted service and it must not be offered as one: GitHub's terms for Codespaces restrict offering Codespaces as a stand-alone or commercial service, and can suspend accounts that misuse them. Do not share your URL or key. Measured on the free 4-core / 16 GB machine: about **8 tokens/s** on Jean Grey, **131k** context (Marvel: 32k), and the Codespace **sleeps after 30 idle minutes**. For fast or heavy work, point your client at any other API instead.
+> **Personal use, your own Space.** This repository is a recipe you run in **your** account, for **you**: do not share your URL or key, and do not resell it as a service. The free Hugging Face hardware ("CPU basic") has **2 vCPU and 16 GB of RAM** and costs nothing: expect a few tokens per second, 32k context per model, and a Space that **sleeps after 48 hours without visits** (the next request wakes it). Fénix (16 GB) does not fit there. For fast or heavy work, point your client at any other API instead.
 
 **Part of a pair.** Pair it with **[JeanCode](https://github.com/jeancodeeer/JeanCode)**, a coding agent and chat client with no backend of its own (desktop, web, Android, iOS): paste this router's URL and you have a private assistant with nobody in the middle.
 
 ```bash
-# the 30-second version, once your Codespace is up
-curl -s https://<codespace>-8899.app.github.dev/v1/models -H "Authorization: Bearer $JEAN_API_KEY"
+# the 30-second version, once your Space is up
+curl -s https://<you>-<space>.hf.space/v1/models -H "Authorization: Bearer $JEAN_API_KEY"
 ```
 
 <br>
@@ -91,18 +91,22 @@ Weights are public on Hugging Face: **[JeanCoder/jean-models](https://huggingfac
 ## 04 — QUICK START
 
 ```
-[1] CREATE      →  Codespace from this repo
-[2] SECRET      →  JEAN_API_KEY
-[3] START       →  autostart.sh launches Grey (+ Marvel with ≥ 14 GB)
-[4] PUBLISH     →  forward ports 8888 / 8889 as public
+[1] KEY         →  choose a long random key (JeanCode generates one)
+[2] DUPLICATE   →  the template Space, hardware "CPU basic" (free)
+[3] SECRET      →  JEAN_API_KEY = your key, in the duplicate dialog
+[4] CONNECT     →  https://<you>-<space>.hf.space/v1
 ```
 
-1. **Create a Codespace** from this repository ([open it here](https://codespaces.new/jeancodeeer/Jean-API-Generator)). The dev container installs `llama.cpp` (prebuilt CPU binary) and prepares the models.
-2. **Add Codespaces secrets** (repository or user level):
-   - `JEAN_API_KEY` – the Bearer key your clients must send (you choose it).
-   - `HF_TOKEN` – optional; the models repo is public, so every model downloads anonymously.
-3. **Start / restart the Codespace.** `postStartCommand` runs `.devcontainer/autostart.sh`, which launches Grey on `:8888` and, with ≥ 14 GB RAM, Marvel on `:8889`.
-4. **Make the ports reachable.** Ports 8888/8889 must be forwarded as *public* (the API key protects them). If `GH_PAT` is set as a secret, the Codespace also records its Cloudflare fallback URLs in `~/logs/urls.txt`.
+1. **Pick a key.** Any long random string; the **Generate** button on JeanCode's start screen makes one. Never write it in a file of the repository.
+2. **Duplicate the Space:** [open the template](https://huggingface.co/spaces/JeanCoder/jean-api?duplicate=true), keep the free **CPU basic** hardware and the visibility **Public** (the key protects it; a private Space would need a Hugging Face token on every request).
+3. **Paste your key** in the `JEAN_API_KEY` field of the same dialog. It is stored as a secret: nobody, including the template's owner, can read it.
+4. **Wait 3–6 minutes** for the build and the first model download, then use `https://<you>-<space>.hf.space/v1` with your key. In JeanCode you can paste just `<you>/<space>`.
+
+No template at hand? Create a new Space with **SDK: Docker**, upload [`space/Dockerfile`](space/Dockerfile) as its `Dockerfile` and add the `JEAN_API_KEY` secret in *Settings → Variables and secrets*. That file is everything the Space needs: it clones this repository at build time. *Settings → Factory rebuild* picks up new versions.
+
+### Alternative: GitHub Codespaces
+
+Create a Codespace from this repository ([open it here](https://codespaces.new/jeancodeeer/Jean-API-Generator)) with the `JEAN_API_KEY` Codespaces secret; `.devcontainer/autostart.sh` launches Grey on `:8888`, Marvel on `:8889` and the router on `:8899`. It uses your monthly Codespaces quota (120 core-hours on the free plan, about 30 hours on the 4-core machine), and GitHub stops it when the quota runs out.
 
 Run a single model by hand inside the Codespace:
 
@@ -168,7 +172,7 @@ sudo bash oracle/setup-vm.sh --model fenix --api-key "…" # systemd service on 
 
 ## 05a — ONE URL FOR EVERY MODEL (ROUTER)
 
-Port **:8899** is also an OpenAI-compatible router: point any client at `https://<codespace>-8899.app.github.dev/v1` and it sees every model the Codespace is serving, including the GGUFs you load from Hugging Face.
+The router is OpenAI-compatible: point any client at `https://<you>-<space>.hf.space/v1` (on a Codespace, `https://<codespace>-8899.app.github.dev/v1`) and it sees every model being served, including the GGUFs you load from Hugging Face.
 
 | METHOD | PATH | WHAT IT DOES |
 |---|---|---|
@@ -186,7 +190,7 @@ Port **:8899** is also an OpenAI-compatible router: point any client at `https:/
 
 ## 05b — LOAD ANY HUGGING FACE MODEL (CONTROL SERVER)
 
-`control/control_server.py` listens on **:8899** (started by `autostart.sh`, protected by your `JEAN_API_KEY`). A client such as **[JeanCode](https://github.com/jeancodeeer/JeanCode)** uses it to put any GGUF from Hugging Face on one of the model ports without opening the Codespace:
+`control/control_server.py` is that same router: on a Space it answers at the Space URL (port 7860 inside the container), on a Codespace on **:8899**, always protected by your `JEAN_API_KEY`. A client such as **[JeanCode](https://github.com/jeancodeeer/JeanCode)** uses it to put any GGUF from Hugging Face on one of the model ports without opening the Codespace:
 
 | METHOD | PATH | WHAT IT DOES |
 |---|---|---|
@@ -207,6 +211,7 @@ Port **:8899** is also an OpenAI-compatible router: point any client at `https:/
 Jean-API-Generator/
 ├── serve.sh                 # download GGUF + launch llama-server (single source of server flags)
 ├── jean-api.ps1             # Windows control script (gh CLI)
+├── space/                   # Hugging Face Space: Dockerfile, start script, Space card
 ├── .devcontainer/           # Codespaces: prep, autostart, watchdog, mode switches
 ├── generator/               # RAM-aware launchers for Linux/macOS/WSL (sh) and Windows (ps1)
 ├── oracle/setup-vm.sh       # systemd install on a VM
@@ -223,7 +228,8 @@ Jean-API-Generator/
 No quality claims without numbers you can rerun. `tests/bench_humaneval.py` runs OpenAI's public [HumanEval](https://github.com/openai/human-eval) against **any** OpenAI-compatible endpoint, at temperature 0, with reasoning off, and writes every result to `bench/humaneval-<model>.json`:
 
 ```bash
-# inside your Codespace (it executes the code the model writes: keep it there, not on your PC)
+# inside a Codespace or container (it executes the code the model writes: not on your PC)
+# against a Space from anywhere: add --base-url https://<you>-<space>.hf.space/v1
 python3 tests/bench_humaneval.py --model jean-grey --n 40     # first 40 problems
 python3 tests/bench_humaneval.py --model jean-marvel          # all 164
 ```
@@ -232,7 +238,9 @@ Results are published in [`bench/`](bench/) as they are measured, with the exact
 
 ## 07 — LIMITS
 
-- A Codespace sleeps when idle; the forwarded URLs stop answering until it is woken again.
+- A free Space sleeps after 48 hours without visits; the next request wakes it, and the models download again (2–4 minutes) because the Space disk is not persistent.
+- The free Space has 2 vCPU: slower than the 4-core Codespace, and the two models share those cores when both are busy.
+- A Codespace sleeps when idle and spends your monthly quota while it is on; when the quota runs out GitHub stops it until the next cycle.
 - Free Codespaces are CPU-only with 16 GB RAM: expect small-model speeds, not GPU speeds. Measured: a one-word answer took 8.4 s on Grey and 3.5 s on Marvel.
 - Three models at 128k simultaneously do not fit in 16 GB.
 

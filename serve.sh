@@ -13,6 +13,9 @@
 #   JEAN_GH_REPO   repo GitHub del release  (default jeancodeeer/jean-api)
 #   JEAN_GH_TAG    tag del release          (default v0.7-models)
 #   PORT           puerto (default 8888)
+#   JEAN_CTX       contexto de Grey/Marvel (default 131072; el Space gratuito de Hugging Face usa 32768)
+#   JEAN_THREADS   hilos de CPU (default: nproc; en un Space hay que fijarlo a sus 2 vCPU)
+#   JEAN_LLAMA_BIN ruta de un llama-server ya instalado (el Space usa el de la imagen oficial)
 set -euo pipefail
 
 MODEL="${1:-grey}"
@@ -60,7 +63,7 @@ BASE="$(basename "$FILE" .gguf)"
 # Contexto: 128k con KV q8_0 (verificado en vivo: ambos a la vez, 3.7 GB
 # libres en el codespace de 16 GB). Fenix: FENIX_CTX configurable; el lite
 # en 16 GB debe bajarlo (4096-8192).
-CTX=131072
+CTX="${JEAN_CTX:-131072}"
 [ "$MODEL" = "fenix" ] && CTX="${FENIX_CTX:-131072}"
 [ "$MODEL" = "custom" ] && CTX="${CUSTOM_CTX:-16384}"
 
@@ -169,11 +172,11 @@ print(fit[-1][1])
 }
 
 # ---------------------------------------------------------------- main
-BIN=$(find_server)
+BIN="${JEAN_LLAMA_BIN:-$(find_server)}"
 [ -n "$BIN" ] || { install_llama; BIN=$(find_server); }
 [ -n "$BIN" ] || fail "no pude instalar llama-server"
 
-THREADS=$(nproc 2>/dev/null || echo 4)
+THREADS="${JEAN_THREADS:-$(nproc 2>/dev/null || echo 4)}"
 LORA_ARGS=()
 
 if [ "$MODEL" = "custom" ]; then
