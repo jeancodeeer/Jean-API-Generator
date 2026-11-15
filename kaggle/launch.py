@@ -240,14 +240,20 @@ def router_models():
 
 
 SESSION_KEY = False  # True si la clave se generó para esta sesión (no hay secreto)
+KEY_SHOWN = False    # la clave de sesión se muestra UNA sola vez (la salida queda guardada en el notebook)
 
 
 def banner(url, ready):
+    global KEY_SHOWN
     print("\n" + "=" * 72, flush=True)
     print(f"  URL para JeanCode :  {url}/v1", flush=True)
-    if SESSION_KEY:
+    if SESSION_KEY and not KEY_SHOWN:
+        KEY_SHOWN = True
         print(f"  Clave             :  {os.environ['JEAN_API_KEY']}", flush=True)
-        print("                       (solo para esta sesión; para una fija, añade el secreto JEAN_API_KEY)", flush=True)
+        print("                       solo vale para esta sesión. No publiques la salida de este notebook;", flush=True)
+        print("                       para una clave fija que nunca se muestra, añade el secreto JEAN_API_KEY.", flush=True)
+    elif SESSION_KEY:
+        print("  Clave             :  la de esta sesión (mostrada arriba, en el primer recuadro)", flush=True)
     else:
         print("  Clave             :  tu JEAN_API_KEY (la de los Secrets de Kaggle)", flush=True)
     print(f"  Modelos listos    :  {', '.join(ready) if ready else '(cargando...)'}", flush=True)
