@@ -13,6 +13,7 @@
 [![MODELOS](https://img.shields.io/badge/MODELOS-JEANCODER%2FJEAN--MODELS-ffffff?style=for-the-badge&labelColor=000000)](https://huggingface.co/JeanCoder/jean-models)
 [![MOTOR](https://img.shields.io/badge/MOTOR-LLAMA.CPP-ffffff?style=for-the-badge&labelColor=000000)](https://github.com/ggml-org/llama.cpp)
 ![API](https://img.shields.io/badge/API-COMPATIBLE_OPENAI-ffffff?style=for-the-badge&labelColor=000000)
+[![KAGGLE](https://img.shields.io/badge/EJECUTAR_EN-KAGGLE_GPU-000000?style=for-the-badge&labelColor=ffffff&logo=kaggle&logoColor=000000)](kaggle/jean-api.ipynb)
 [![CODESPACES](https://img.shields.io/badge/ABRIR_EN-CODESPACES-000000?style=for-the-badge&labelColor=ffffff&logo=github&logoColor=000000)](https://codespaces.new/jeancodeeer/Jean-API-Generator)
 
 [`ENGLISH`](README.md) · **`ESPAÑOL`**
@@ -22,7 +23,7 @@
 ```
 N° 001 — JEANCODE-API                                                REF. V0.7
 Sirve los modelos GGUF Jean como una API gratuita compatible con OpenAI.
-llama.cpp `llama-server` · GitHub Codespaces · solo CPU · contexto 128k
+llama.cpp `llama-server` · Kaggle (GPU gratis) o GitHub Codespaces (CPU)
 ```
 
 > [!TIP]
@@ -87,6 +88,31 @@ Pesos públicos en **[JeanCoder/jean-models](https://huggingface.co/JeanCoder/je
 <br>
 
 ## 04 — INICIO RÁPIDO
+
+### Opción A — Kaggle (GPU gratis, sin tarjeta): la recomendada
+
+Kaggle da a cada cuenta con el teléfono verificado **dos GPU NVIDIA T4** gratis, unas 30 horas a la semana, que se renuevan **cada semana**. Con ellas los modelos Jean corren en GPU, mucho más rápido que en cualquier máquina gratuita de CPU, y cabe hasta Fénix.
+
+```
+[1] VERIFICA    →  tu teléfono en Kaggle (necesario para GPU e internet)
+[2] IMPORTA     →  kaggle/jean-api.ipynb en un notebook nuevo de Kaggle
+[3] AJUSTES     →  Accelerator: GPU T4 x2 · Internet: On
+[4] SECRETO     →  opcional: Add-ons → Secrets → JEAN_API_KEY
+[5] RUN ALL     →  copia la URL que imprime en JeanCode
+```
+
+1. En Kaggle: **Create → New Notebook → File → Import Notebook** y elige [`kaggle/jean-api.ipynb`](kaggle/jean-api.ipynb) de este repositorio.
+2. En el panel derecho, **Settings**: *Accelerator* `GPU T4 x2`, *Internet* `On`.
+3. *(Opcional)* **Add-ons → Secrets → Add secret**, nombre `JEAN_API_KEY`, valor: una clave larga y aleatoria, para tener siempre la misma; nunca aparece en el código ni en la salida. Sin ella, el notebook crea una clave para cada sesión y la muestra junto a la URL (la salida de tu notebook solo la ves tú).
+4. **Run All.** En 3–6 minutos aparece un recuadro con la URL (`https://….trycloudflare.com/v1`) y la clave. Pega las dos en JeanCode.
+
+Qué hace el notebook: clona este repositorio y ejecuta [`kaggle/launch.py`](kaggle/launch.py), que instala el binario oficial de llama.cpp con CUDA (no compila nada), sirve cada modelo con el mismo `serve.sh` en su propia GPU, arranca el mismo router en `:8899` y abre un túnel de Cloudflare hacia él. Si un modelo o el túnel se caen, los relanza.
+
+**Modelos:** edita `MODELOS` en el notebook: `grey`, `marvel`, `fenix` (las dos GPU), `hf:usuario/repo/archivo.gguf` para cualquier GGUF de Hugging Face (añade el secreto `HF_TOKEN` para los privados) o `file:/kaggle/input/…/modelo.gguf` para un GGUF tuyo subido como dataset y añadido con **Add Input**. El panel de Hugging Face de JeanCode carga más modelos mientras corre.
+
+**Límites:** una sesión de Kaggle dura hasta ~12 horas; después pulsa **Run All** otra vez y la URL cambia. Los términos de Kaggle permiten uso personal y no comercial: es tu propia API para ti, no un servicio para otros.
+
+### Opción B — GitHub Codespaces (CPU)
 
 ```
 [1] CREAR       →  Codespace desde este repo

@@ -13,6 +13,7 @@
 [![MODELS](https://img.shields.io/badge/MODELS-JEANCODER%2FJEAN--MODELS-ffffff?style=for-the-badge&labelColor=000000)](https://huggingface.co/JeanCoder/jean-models)
 [![ENGINE](https://img.shields.io/badge/ENGINE-LLAMA.CPP-ffffff?style=for-the-badge&labelColor=000000)](https://github.com/ggml-org/llama.cpp)
 ![API](https://img.shields.io/badge/API-OPENAI--COMPATIBLE-ffffff?style=for-the-badge&labelColor=000000)
+[![KAGGLE](https://img.shields.io/badge/RUN_ON-KAGGLE_GPU-000000?style=for-the-badge&labelColor=ffffff&logo=kaggle&logoColor=000000)](kaggle/jean-api.ipynb)
 [![CODESPACES](https://img.shields.io/badge/OPEN_IN-CODESPACES-000000?style=for-the-badge&labelColor=ffffff&logo=github&logoColor=000000)](https://codespaces.new/jeancodeeer/Jean-API-Generator)
 
 **`ENGLISH`** · [`ESPAÑOL`](README.es.md)
@@ -22,7 +23,7 @@
 ```
 N° 001 — JEANCODE-API                                                REF. V0.7
 Serve the Jean GGUF models as a free, OpenAI-compatible API.
-llama.cpp `llama-server` · GitHub Codespaces · CPU only · 128k context
+llama.cpp `llama-server` · Kaggle (free GPU) or GitHub Codespaces (CPU)
 ```
 
 > [!TIP]
@@ -89,6 +90,31 @@ Weights are public on Hugging Face: **[JeanCoder/jean-models](https://huggingfac
 <br>
 
 ## 04 — QUICK START
+
+### Option A — Kaggle (free GPU, no card): recommended
+
+Kaggle gives every phone-verified account **two NVIDIA T4 GPUs** for free, about 30 hours a week, renewed **every week**. With them the Jean models run on GPU, much faster than any free CPU machine, and even Fénix fits.
+
+```
+[1] VERIFY      →  your phone in Kaggle (needed for GPU and internet)
+[2] IMPORT      →  kaggle/jean-api.ipynb into a new Kaggle notebook
+[3] SETTINGS    →  Accelerator: GPU T4 x2 · Internet: On
+[4] SECRET      →  optional: Add-ons → Secrets → JEAN_API_KEY
+[5] RUN ALL     →  copy the URL it prints into JeanCode
+```
+
+1. In Kaggle: **Create → New Notebook → File → Import Notebook** and pick [`kaggle/jean-api.ipynb`](kaggle/jean-api.ipynb) from this repository.
+2. In the right panel, **Settings**: *Accelerator* `GPU T4 x2`, *Internet* `On`.
+3. *(Optional)* **Add-ons → Secrets → Add secret**, name `JEAN_API_KEY`, value: a long random key, to keep the same key every session; it never appears in the code or the output. Without it, the notebook creates a key for each session and shows it next to the URL (only you can see your notebook's output).
+4. **Run All.** In 3–6 minutes a box shows the URL (`https://….trycloudflare.com/v1`) and the key. Paste both in JeanCode.
+
+What the notebook does: it clones this repository and runs [`kaggle/launch.py`](kaggle/launch.py), which installs the official llama.cpp CUDA build (nothing is compiled), serves each model with the same `serve.sh` on its own GPU, starts the same router on `:8899` and opens a Cloudflare tunnel to it. If a model or the tunnel stops, it relaunches it.
+
+**Models:** edit `MODELOS` in the notebook: `grey`, `marvel`, `fenix` (both GPUs), `hf:user/repo/file.gguf` for any GGUF on Hugging Face (add an `HF_TOKEN` secret for private ones), or `file:/kaggle/input/…/model.gguf` for your own GGUF uploaded as a dataset and attached with **Add Input**. JeanCode's Hugging Face panel can load more models while it runs.
+
+**Limits:** a Kaggle session lasts up to ~12 hours; after that press **Run All** again, and the URL changes. Kaggle's terms allow personal, non-commercial use: this is your own API for you, not a service for others.
+
+### Option B — GitHub Codespaces (CPU)
 
 ```
 [1] CREATE      →  Codespace from this repo
@@ -207,6 +233,7 @@ Port **:8899** is also an OpenAI-compatible router: point any client at `https:/
 Jean-API-Generator/
 ├── serve.sh                 # download GGUF + launch llama-server (single source of server flags)
 ├── jean-api.ps1             # Windows control script (gh CLI)
+├── kaggle/                  # Kaggle notebook + launcher (free T4 GPUs)
 ├── .devcontainer/           # Codespaces: prep, autostart, watchdog, mode switches
 ├── generator/               # RAM-aware launchers for Linux/macOS/WSL (sh) and Windows (ps1)
 ├── oracle/setup-vm.sh       # systemd install on a VM
