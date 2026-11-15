@@ -13,6 +13,11 @@
 #   JEAN_GH_REPO   repo GitHub del release  (default jeancodeeer/jean-api)
 #   JEAN_GH_TAG    tag del release          (default v0.7-models)
 #   PORT           puerto (default 8888)
+#   JEAN_CTX       contexto de Grey/Marvel (default 131072)
+#   JEAN_THREADS   hilos de CPU (default: nproc)
+#   JEAN_LLAMA_BIN ruta de un llama-server ya instalado (Kaggle usa el binario CUDA oficial)
+#   JEAN_NGL       capas en la GPU (p. ej. 99 = todas); sin definir = solo CPU, como en Codespaces
+#   JEAN_GPU       GPU(s) para este modelo (CUDA_VISIBLE_DEVICES, p. ej. 0, 1 o 0,1)
 set -euo pipefail
 
 MODEL="${1:-grey}"
@@ -60,7 +65,7 @@ BASE="$(basename "$FILE" .gguf)"
 # Contexto: 128k con KV q8_0 (verificado en vivo: ambos a la vez, 3.7 GB
 # libres en el codespace de 16 GB). Fenix: FENIX_CTX configurable; el lite
 # en 16 GB debe bajarlo (4096-8192).
-CTX=131072
+CTX="${JEAN_CTX:-131072}"
 [ "$MODEL" = "fenix" ] && CTX="${FENIX_CTX:-131072}"
 [ "$MODEL" = "custom" ] && CTX="${CUSTOM_CTX:-16384}"
 
@@ -169,11 +174,11 @@ print(fit[-1][1])
 }
 
 # ---------------------------------------------------------------- main
-BIN=$(find_server)
+BIN="${JEAN_LLAMA_BIN:-$(find_server)}"
 [ -n "$BIN" ] || { install_llama; BIN=$(find_server); }
 [ -n "$BIN" ] || fail "no pude instalar llama-server"
 
-THREADS=$(nproc 2>/dev/null || echo 4)
+THREADS="${JEAN_THREADS:-$(nproc 2>/dev/null || echo 4)}"
 LORA_ARGS=()
 
 if [ "$MODEL" = "custom" ]; then
@@ -208,7 +213,10 @@ rm -f "$STATUS_FILE"
 # La clave va por entorno (LLAMA_API_KEY, que llama-server lee), NO como argumento: un argumento
 # se ve en la lista de procesos (ps, pgrep -af) y acababa copiado en ~/logs/status.md.
 export LLAMA_API_KEY="${JEAN_API_KEY:-}"
-exec "$BIN" -m "$GGDIR/$FILE" "${LORA_ARGS[@]}" --host 0.0.0.0 --port "$PORT" \
+GPU_ARGS=()
+[ -n "${JEAN_NGL:-}" ] && GPU_ARGS=(-ngl "$JEAN_NGL")
+[ -n "${JEAN_GPU:-}" ] && export CUDA_VISIBLE_DEVICES="$JEAN_GPU"
+exec "$BIN" -m "$GGDIR/$FILE" "${GPU_ARGS[@]}" "${LORA_ARGS[@]}" --host 0.0.0.0 --port "$PORT" \
   --alias "$ALIAS" -c "$CTX" --threads "$THREADS" \
   -ctk q8_0 -ctv q8_0 \
   --temp 0.2 --top-p 0.9
