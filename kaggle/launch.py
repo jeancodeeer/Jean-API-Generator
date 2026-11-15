@@ -255,6 +255,17 @@ def router_models():
         return [], []
 
 
+def show_tail(path, n=12):
+    """Muestra el final de un registro en la salida del notebook (la clave nunca está en los registros)."""
+    try:
+        with open(path, encoding="utf-8", errors="replace") as f:
+            lines = f.readlines()[-n:]
+    except OSError:
+        lines = ["(sin registro)\n"]
+    for line in lines:
+        print("    │ " + line.rstrip()[:200], flush=True)
+
+
 SESSION_KEY = False  # True si la clave se generó para esta sesión (no hay secreto)
 KEY_SHOWN = False    # la clave de sesión se muestra UNA sola vez (la salida queda guardada en el notebook)
 
@@ -311,10 +322,12 @@ def main():
         time.sleep(60)
         for s in plan:  # un modelo caído se relanza (serve.sh deja el motivo al router)
             if procs[s["port"]].poll() is not None:
-                say(f"{s['alias']} se detuvo; lo relanzo (detalle en {WORK}/serve-{s['port']}.log)")
+                say(f"{s['alias']} se detuvo; lo relanzo. Últimas líneas de su registro:")
+                show_tail(os.path.join(WORK, f"serve-{s['port']}.log"))
                 procs[s["port"]] = start_model(s, binary, ctx)
         if router.poll() is not None:
-            say("router caído; lo relanzo")
+            say("router caído; lo relanzo. Últimas líneas de su registro:")
+            show_tail(os.path.join(WORK, "router.log"))
             router = start_router(plan, binary, gpus)
         if tunnel.poll() is not None:
             tunnel, url = start_tunnel(cf)
